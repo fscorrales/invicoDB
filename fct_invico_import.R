@@ -7,9 +7,25 @@ library(invicodatr)
 input_path <- paste(getwd(), "Base de Datos",sep = "/") # Does I need it?
 #output_path define inside invicodatr (Should I change it?)
 
-#INVICO-------
+#INVICO Sistema de Seguimiento de Cuentas Corrientes (SSCC)-------
 
-##as
+##BD Mov SSCC (INVICO)
+sscc_banco_invico <- rpw_sscc_banco_invico(
+  dir("Base de Datos/Sistema de Seguimiento de Cuentas Corrientes/Movimientos Generales SSCC/", 
+      full.names = TRUE), 
+  write_csv = TRUE, write_sqlite = TRUE)
+
+##Importamos Imputaciones SSCC (INVICO) - NOT Working yet
+
+###Joinning Mov SSCC + Imputaciones SSCC (not working yet)
+
+#INVICO Sistema Gestion Financiera (SGF)-------
+
+##Resumen de Rendiciones INVICO SGF
+sgf_resumen_rend_prov <- rpw_sgf_resumen_rend_prov(
+  dir("Base de Datos/Sistema Gestion Financiera/Resumen de Rendiciones SGF/", 
+      full.names = TRUE), 
+  write_csv = TRUE, write_sqlite = TRUE)
 
 #SIIF GASTOS--------
 
@@ -80,5 +96,23 @@ siif_deuda_flotante_tg <- rpw_siif_deuda_flotante_tg(
 ##Listado de Pagos Tesorería SIIF (rtr03)
 siif_pagos <- rpw_siif_pagos(
   dir("Base de Datos/Reportes SIIF/Listado Pagos Tesoreria (rtr03)/", 
+      full.names = TRUE), 
+  write_csv = TRUE, write_sqlite = TRUE)
+
+#SIIF RECURSOS--------- 
+
+##Recursos SIIF (rci02)
+siif_comprobantes_rec <- rpw_siif_comprobantes_rec(
+  dir("Base de Datos/Reportes SIIF/Comprobantes de Recursos (rci02)/", 
+      full.names = TRUE), 
+  write_csv = TRUE, write_sqlite = TRUE)
+
+##Recursos SIIF por Código (ri102) - NOT Working yet
+
+#SIIF CONTABILIDAD--------------
+
+##Movimientos Contables SIIF (rcocc31)
+siif_mayor_contable <- rpw_siif_mayor_contable(
+  dir("Base de Datos/Reportes SIIF/Movimientos Contables (rcocc31)/", 
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE)
