@@ -116,3 +116,8 @@ siif_mayor_contable <- rpw_siif_mayor_contable(
   dir("Base de Datos/Reportes SIIF/Movimientos Contables (rcocc31)/", 
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE)
+#Primary Key -----
+
+##Primary Key Cuentas Corrientes
+cta_cte <- rpw_cta_cte("Base de Datos/Primary Key/primary_key_cta_cte.xlsx",
+                       write_csv = TRUE, write_sqlite = TRUE)
