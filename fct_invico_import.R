@@ -1,11 +1,34 @@
 #SETUP---------------------
 
+##In Windows, there is no distinction between lowercase 
+##and uppercase DB' name (Beware)
+
 ##LOAD LIBRARY
 library(invicodatr)
+library(magrittr)
 
 ##INPUT & OUTOPUT PATH
 input_path <- paste(getwd(), "Base de Datos",sep = "/") # Does I need it?
 #output_path define inside invicodatr (Should I change it?)
+div_path <- function(full_path){
+  
+  Ans <- stringr::str_split(full_path, "/", simplify = T) %>%
+    as.vector()
+  
+}
+
+output_path <- function(){
+  
+  # Ans <- stringr::str_split(getwd(), "/", simplify = T)
+  Ans <- div_path(getwd())
+  Ans <- Ans[1:(length(Ans)-1)] %>%
+    sapply(function(x) paste0(x, "/")) %>%
+    paste(collapse = "") %>%
+    paste0("R Output")
+  
+  return(Ans)
+  
+}
 
 #INVICO Sistema de Seguimiento de Cuentas Corrientes (SSCC)-------
 
@@ -116,6 +139,15 @@ siif_mayor_contable <- rpw_siif_mayor_contable(
   dir("Base de Datos/Reportes SIIF/Movimientos Contables (rcocc31)/", 
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE)
+#ICARO ------
+
+##Transmute old ICARO DB to new version (I put the old version
+##outsite of SQLite Files to prevent overwritting)
+
+icaro <- transmute_icaro_old_to_new(
+  paste0(output_path(), "/ICARO.sqlite"), 
+  write_csv = TRUE, write_sqlite = TRUE)
+
 #Primary Key -----
 
 ##Primary Key Cuentas Corrientes
