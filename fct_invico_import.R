@@ -30,6 +30,12 @@ output_path <- function(){
   
 }
 
+#Primary Key -----
+
+##Primary Key Cuentas Corrientes
+cta_cte <- rpw_cta_cte("Base de Datos/Primary Key/primary_key_cta_cte.xlsx",
+                       write_csv = TRUE, write_sqlite = TRUE)
+
 #INVICO Sistema de Seguimiento de Cuentas Corrientes (SSCC)-------
 
 ##BD Mov SSCC (INVICO)
@@ -148,8 +154,3 @@ icaro <- transmute_icaro_old_to_new(
   paste0(output_path(), "/ICARO.sqlite"), 
   write_csv = TRUE, write_sqlite = TRUE)
 
-#Primary Key -----
-
-##Primary Key Cuentas Corrientes
-cta_cte <- rpw_cta_cte("Base de Datos/Primary Key/primary_key_cta_cte.xlsx",
-                       write_csv = TRUE, write_sqlite = TRUE)
