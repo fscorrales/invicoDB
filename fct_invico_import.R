@@ -147,10 +147,8 @@ siif_mayor_contable <- rpw_siif_mayor_contable(
   write_csv = TRUE, write_sqlite = TRUE)
 #ICARO ------
 
-##Transmute old ICARO DB to new version (I put the old version
-##outsite of SQLite Files to prevent overwritting)
-
+##Transmute old ICARO DB to new version 
 icaro <- transmute_icaro_old_to_new(
-  paste0(output_path(), "/ICARO.sqlite"), 
+  paste0(output_path(), "/SQLite Files/ICARO.sqlite"), 
   write_csv = TRUE, write_sqlite = TRUE)
 
