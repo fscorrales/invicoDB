@@ -56,6 +56,12 @@ sgf_resumen_rend_prov <- rpw_sgf_resumen_rend_prov(
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE)
 
+##Listado Proveedores INVICO SGF
+sgf_listado_prov <- rpw_sgf_listado_prov(
+  dir("Base de Datos/Sistema Gestion Financiera/Otros Reportes/", 
+      full.names = TRUE), 
+  write_csv = TRUE, write_sqlite = TRUE)
+
 #SIIF GASTOS--------
 
 ##Ejecución Presupuestaria con Fuente SIIF (rf602)
