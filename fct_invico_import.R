@@ -68,13 +68,13 @@ sgf_listado_prov <- rpw_sgf_listado_prov(
 siif_ppto_gtos_fte <- rpw_siif_ppto_gtos_fte(
   dir("Base de Datos/Reportes SIIF/Ejecucion Presupuestaria con Fuente (rf602)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ##Ejecución Presupuestaria con Descripcion SIIF (rf610)
 siif_ppto_gtos_desc <- rpw_siif_ppto_gtos_desc(
   dir("Base de Datos/Reportes SIIF/Ejecucion Presupuestaria con Descripcion (rf610)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ###Joinning rf602 and rf610 (not working yet)
 
@@ -82,7 +82,7 @@ siif_ppto_gtos_desc <- rpw_siif_ppto_gtos_desc(
 siif_comprobantes_gtos <- rpw_siif_comprobantes_gtos(
   dir("Base de Datos/Reportes SIIF/Comprobantes de Gastos (rcg01_uejp)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ###Filter MAP from rcg01_uejp (Should I do it? NOT working yet)
 
@@ -90,7 +90,7 @@ siif_comprobantes_gtos <- rpw_siif_comprobantes_gtos(
 siif_comprobantes_gtos_partida <- rpw_siif_comprobantes_gtos_partida(
   dir("Base de Datos/Reportes SIIF/Comprobantes de Gastos con Partida Pagados sin REM (rcg01_par)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ###Joinning rcg01_par + REM rcg01_uejp (not working yet)
 
@@ -98,7 +98,7 @@ siif_comprobantes_gtos_partida <- rpw_siif_comprobantes_gtos_partida(
 siif_comprobantes_gtos_gpo_partida <- rpw_siif_comprobantes_gtos_gpo_partida(
   dir("Base de Datos/Reportes SIIF/Comprobantes de Gastos por Grupo Partida (gto_rpa03g)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ###Joinning gto_rpa03g + rcg01_uejp (not working yet)
 
@@ -114,13 +114,13 @@ siif_retenciones_por_codigo <- rpw_siif_retenciones_por_codigo(
 siif_resumen_fdos <- rpw_siif_resumen_fdos(
   dir("Base de Datos/Reportes SIIF/Comprobantes de Fondos Regularizados por Tipo (rfondo07tp)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ##Deuda Flotante SIIF (rdeu012)
 siif_deuda_flotante <- rpw_siif_deuda_flotante(
   dir("Base de Datos/Reportes SIIF/Deuda Flotante (rdeu)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ##Deuda Flotante SIIF TG (rdeu012b2_C)
 siif_deuda_flotante_tg <- rpw_siif_deuda_flotante_tg(
@@ -140,7 +140,7 @@ siif_pagos <- rpw_siif_pagos(
 siif_comprobantes_rec <- rpw_siif_comprobantes_rec(
   dir("Base de Datos/Reportes SIIF/Comprobantes de Recursos (rci02)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ##Recursos SIIF por Código (ri102) - NOT Working yet
 
@@ -150,7 +150,7 @@ siif_comprobantes_rec <- rpw_siif_comprobantes_rec(
 siif_mayor_contable <- rpw_siif_mayor_contable(
   dir("Base de Datos/Reportes SIIF/Movimientos Contables (rcocc31)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 #ICARO ------
 
 ##Transmute old ICARO DB to new version 
