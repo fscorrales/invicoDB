@@ -54,7 +54,7 @@ sscc_banco_invico <- rpw_sscc_banco_invico(
 sgf_resumen_rend_prov <- rpw_sgf_resumen_rend_prov(
   dir("Base de Datos/Sistema Gestion Financiera/Resumen de Rendiciones SGF/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ##Listado Proveedores INVICO SGF
 sgf_listado_prov <- rpw_sgf_listado_prov(
@@ -106,7 +106,7 @@ siif_comprobantes_gtos_gpo_partida <- rpw_siif_comprobantes_gtos_gpo_partida(
 siif_retenciones_por_codigo <- rpw_siif_retenciones_por_codigo(
   dir("Base de Datos/Reportes SIIF/Listado Retenciones Practicadas por Codigo (rao01)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ###Joinning rcg01_uejp + rao01 (not working yet)
 
@@ -126,13 +126,13 @@ siif_deuda_flotante <- rpw_siif_deuda_flotante(
 siif_deuda_flotante_tg <- rpw_siif_deuda_flotante_tg(
   dir("Base de Datos/Reportes SIIF/Deuda Flotante TG (rdeu012b2_C)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 ##Listado de Pagos Tesorería SIIF (rtr03)
 siif_pagos <- rpw_siif_pagos(
   dir("Base de Datos/Reportes SIIF/Listado Pagos Tesoreria (rtr03)/", 
       full.names = TRUE), 
-  write_csv = TRUE, write_sqlite = TRUE)
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 #SIIF RECURSOS--------- 
 
