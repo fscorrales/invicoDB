@@ -158,3 +158,9 @@ icaro <- transmute_icaro_old_to_new(
   paste0(output_path(), "/SQLite Files/ICARO.sqlite"), 
   write_csv = TRUE, write_sqlite = TRUE)
 
+
+#SLAVE ----
+
+##From Access version (excel table) to sqlite
+slave <- rpw_slave_honorarios("Base de Datos/Slave Access/honorarios_slave.xlsx",
+                              write_csv = TRUE, write_sqlite = TRUE)
