@@ -6,6 +6,7 @@
 ##LOAD LIBRARY
 library(invicodatr)
 library(magrittr)
+library(tidyr)
 
 ##INPUT & OUTOPUT PATH
 input_path <- paste(getwd(), "Base de Datos",sep = "/") # Does I need it?
@@ -50,16 +51,21 @@ sscc_banco_invico <- rpw_sscc_banco_invico(
 
 #INVICO Sistema Gestion Financiera (SGF)-------
 
-##Resumen de Rendiciones INVICO SGF
+##Resumen de Rendiciones por Proveedores INVICO SGF
 sgf_resumen_rend_prov <- rpw_sgf_resumen_rend_prov(
   dir("Base de Datos/Sistema Gestion Financiera/Resumen de Rendiciones SGF/", 
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
+##Resumen de Rendiciones por Obra INVICO SGF
+sgf_resumen_rend_obra <- rpw_sgf_resumen_rend_obra(
+  dir("Base de Datos/Sistema Gestion Financiera/Resumen de Rendiciones EPAM por OBRA SGF/",
+      full.names = TRUE),
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
+
 ##Listado Proveedores INVICO SGF
 sgf_listado_prov <- rpw_sgf_listado_prov(
-  dir("Base de Datos/Sistema Gestion Financiera/Otros Reportes/", 
-      full.names = TRUE), 
+  "Base de Datos/Sistema Gestion Financiera/Otros Reportes/Listado de Proveedores.csv", 
   write_csv = TRUE, write_sqlite = TRUE)
 
 #SIIF GASTOS--------
@@ -76,7 +82,23 @@ siif_ppto_gtos_desc <- rpw_siif_ppto_gtos_desc(
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
-###Joinning rf602 and rf610 (not working yet)
+###Joinning rf602 and rf610
+siif_ppto_gtos_desc <- siif_ppto_gtos_desc %>% 
+  tidyr::unite('estructura', 
+               programa, subprograma, proyecto, actividad, partida,
+               sep = '-', remove = FALSE)
+
+siif_ppto_gtos_fte <- siif_ppto_gtos_fte %>% 
+  tidyr::unite('estructura', 
+               programa, subprograma, proyecto, actividad, partida,
+               sep = '-', remove = FALSE)
+
+siif_ppto_gtos <- siif_ppto_gtos_fte %>% 
+  dplyr::left_join(
+    dplyr::select(siif_ppto_gtos_desc,
+                  ejercicio, estructura, desc_proy, desc_act),
+    by = c("ejercicio", "estructura")
+  )
 
 ##Comprobantes Gastos Ingresados (rcg01_uejp)
 siif_comprobantes_gtos <- rpw_siif_comprobantes_gtos(
@@ -142,7 +164,11 @@ siif_comprobantes_rec <- rpw_siif_comprobantes_rec(
       full.names = TRUE), 
   write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
-##Recursos SIIF por Código (ri102) - NOT Working yet
+##Recursos SIIF por Código (ri102) 
+siif_ppto_rec <- rpw_siif_ppto_rec(
+  dir("Base de Datos/Reportes SIIF/Ejecucion Presupuestaria Recursos por Codigo (ri102)/", 
+      full.names = TRUE), 
+  write_csv = TRUE, write_sqlite = TRUE, overwrite_sql = TRUE)
 
 #SIIF CONTABILIDAD--------------
 
@@ -162,5 +188,5 @@ icaro <- transmute_icaro_old_to_new(
 #SLAVE ----
 
 ##From Access version (excel table) to sqlite
-slave <- rpw_slave_honorarios("Base de Datos/Slave Access/honorarios_slave.xlsx",
-                              write_csv = TRUE, write_sqlite = TRUE)
+# slave <- rpw_slave_honorarios("Base de Datos/Slave Access/honorarios_slave.xlsx",
+#                               write_csv = TRUE, write_sqlite = TRUE)
