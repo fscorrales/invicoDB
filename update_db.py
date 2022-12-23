@@ -5,42 +5,22 @@ Purpose: Update set of INVICO DB' sqlite files
 Packages:
  - invicodatpy (pip install '/home/kanou/IT/R Apps/R Gestion INVICO/invicodatpy')
 """
-
 import argparse
 import inspect
 import os
+from dataclasses import dataclass
 
 from invicodatpy.icaro import *
 from invicodatpy.sgf import *
 from invicodatpy.siif import *
 from invicodatpy.sscc import *
 
-
-class UpdateDB():
-    def __init__(self, output_path:str = None) -> None:
-        self.get_working_directory()
-        if output_path == None:
-            self.get_output_path()
-
-    def get_working_directory(self):
-        self.dir_path = os.path.dirname(
-            os.path.abspath(
-                inspect.getfile(
-                    inspect.currentframe())))
-        self.input_path = self.dir_path + '/Base de Datos' 
-        return self.input_path
-
-    def get_output_path(self):
-        self.output_path = (os.path.dirname(self.dir_path) +
-        '/Python Output/SQLite Files')
-        return self.output_path
-
-class UpdateSIIF(UpdateDB):
+# --------------------------------------------------
+@dataclass
+class UpdateSIIF():
     """Read, process and write INVICO DB"""
-    def __init__(self, output_path:str = None) -> None:
-        super().__init__(output_path=output_path)
-        self.input_path += '/Reportes SIIF'
-        self.output_path += '/siif.sqlite'
+    input_path:str
+    output_path:str
 
     # --------------------------------------------------
     def update_all_siif_tables(self):
@@ -109,12 +89,12 @@ class UpdateSIIF(UpdateDB):
             self.input_path + '/Comprobantes de Fondos Regularizados por Tipo (rfondo07tp)',
             output_path=self.output_path, clean_first=True)
 
-class UpdateSGF(UpdateDB):
+# --------------------------------------------------
+@dataclass
+class UpdateSGF():
     """Read, process and write INVICO DB"""
-    def __init__(self, output_path:str = None) -> None:
-        super().__init__(output_path=output_path)
-        self.input_path += '/Sistema Gestion Financiera'
-        self.output_path += '/sgf.sqlite'
+    input_path:str
+    output_path:str
 
     # --------------------------------------------------
     def update_all_sgf_tables(self):
@@ -151,12 +131,12 @@ class UpdateSGF(UpdateDB):
             self.input_path + '/Resumen de Rendiciones SGF',
             output_path=self.output_path, clean_first=True)
 
-class UpdateSSCC(UpdateDB):
+# --------------------------------------------------
+@dataclass
+class UpdateSSCC():
+    input_path:str
+    output_path:str
     """Read, process and write INVICO DB"""
-    def __init__(self, output_path:str = None) -> None:
-        super().__init__(output_path=output_path)
-        self.input_path += '/Sistema de Seguimiento de Cuentas Corrientes'
-        self.output_path += '/sscc.sqlite'
 
     # --------------------------------------------------
     def update_all_sscc_tables(self):
@@ -177,13 +157,15 @@ class UpdateSSCC(UpdateDB):
             self.input_path + '/cta_cte/cta_cte.xlsx',
             output_path=self.output_path, clean_first=True)
 
-class UpdateIcaro(UpdateDB):
+# --------------------------------------------------
+@dataclass
+class UpdateIcaro():
     """Read, process and write INVICO DB"""
-    def __init__(self, output_path:str = None) -> None:
-        super().__init__(output_path=output_path)
-        self.input_path = (os.path.dirname(self.dir_path) +
-        '/R Output/SQLite Files/ICARO.sqlite')
-        self.output_path += '/icaro.sqlite'
+    input_path:str
+    output_path:str
+
+    # --------------------------------------------------
+    def migrate_icaro(self):
         migrate_icaro.MigrateIcaro(
             self.input_path, self.output_path
         ).migrate_all()
@@ -196,6 +178,14 @@ def get_args():
         formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
+        '-i', '--input_path', 
+        metavar = "input_path",
+        default= None,
+        type=str,
+        help = "Base de Datos main folder from where to import files. By default \
+        files would be imported from R Gestion INVICO/invicoDB/Base de Datos")
+
+    parser.add_argument(
         '-o', '--output_path', 
         metavar = "output_path",
         default= None,
@@ -206,13 +196,55 @@ def get_args():
     return parser.parse_args()
 
 # --------------------------------------------------
+def get_current_path():
+    dir_path = os.path.dirname(
+        os.path.abspath(
+            inspect.getfile(
+                inspect.currentframe())))
+    return dir_path
+
+# --------------------------------------------------
+def get_input_path():
+    input_path = get_current_path() + '/Base de Datos'
+    return input_path
+
+# --------------------------------------------------
+def get_output_path():
+    output_path = (os.path.dirname(get_current_path()) +
+    '/Python Output/SQLite Files')
+    return output_path
+
+# --------------------------------------------------
 def main():
     """Let's try it"""
     args = get_args()
-    UpdateSIIF(args.output_path).update_all_siif_tables()
-    UpdateSGF(args.output_path).update_all_sgf_tables()
-    UpdateSSCC(args.output_path).update_all_sscc_tables()
-    UpdateIcaro(args.output_path)
+    if args.input_path == None:
+        input_path = get_input_path()
+    else:
+        input_path = args.input_path
+
+    if args.output_path == None:
+        output_path = get_output_path()
+    else:
+        output_path = args.output_path
+
+    UpdateSIIF(
+        input_path + '/Reportes SIIF', 
+        output_path + '/siif.sqlite'
+        ).update_all_siif_tables()
+    UpdateSGF(
+        input_path + '/Sistema Gestion Financiera', 
+        output_path + '/sgf.sqlite'
+        ).update_all_sgf_tables()
+    UpdateSSCC(
+        input_path + '/Sistema de Seguimiento de Cuentas Corrientes', 
+        output_path + '/sscc.sqlite'
+        ).update_all_sscc_tables()
+    UpdateIcaro(
+        os.path.dirname(get_current_path()) +
+        '/R Output/SQLite Files/ICARO.sqlite', 
+        output_path + '/icaro.sqlite'
+        ).migrate_icaro()
 
 # --------------------------------------------------
 if __name__ == '__main__':
