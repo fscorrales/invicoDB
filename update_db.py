@@ -3,7 +3,7 @@
 Author: Fernando Corrales <fscorrales@gmail.com>
 Purpose: Update set of INVICO DB' sqlite files
 Packages:
- - invicodatpy (pip install '/home/kanou/IT/R Apps/R Gestion INVICO/invicodatpy')
+ - invicodatpy (pip install -e '/home/kanou/IT/R Apps/R Gestion INVICO/invicodatpy')
 """
 import argparse
 import inspect
