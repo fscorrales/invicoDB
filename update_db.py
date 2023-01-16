@@ -14,6 +14,8 @@ from invicodatpy.icaro import *
 from invicodatpy.sgf import *
 from invicodatpy.siif import *
 from invicodatpy.sscc import *
+from invicodatpy.slave import *
+
 
 # --------------------------------------------------
 @dataclass
@@ -171,6 +173,19 @@ class UpdateIcaro():
         ).migrate_all()
 
 # --------------------------------------------------
+@dataclass
+class UpdateSlave():
+    """Read, process and write SLAVE DB from mdb to sqlite"""
+    input_path:str
+    output_path:str
+
+    # --------------------------------------------------
+    def migrate_slave(self):
+        migrate_slave.MigrateSlave(
+            self.input_path, self.output_path
+        ).migrate_all()
+
+# --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
     parser = argparse.ArgumentParser(
@@ -245,6 +260,10 @@ def main():
         '/R Output/SQLite Files/ICARO.sqlite', 
         output_path + '/icaro.sqlite'
         ).migrate_icaro()
+    UpdateSlave(
+        input_path + '/Slave/Slave.mdb', 
+        output_path + '/slave.sqlite'
+        ).migrate_slave()
 
 # --------------------------------------------------
 if __name__ == '__main__':
