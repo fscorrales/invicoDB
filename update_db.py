@@ -30,6 +30,7 @@ class UpdateSIIF():
         self.update_comprobantes_gtos_gpo_part_gto_rpa03g()
         self.update_comprobantes_rec_rci02()
         self.update_deuda_flotante_rdeu012()
+        self.update_deuda_flotante_rdeu012b2_c()
         self.update_mayor_contable_rcocc31()
         self.update_ppto_gtos_desc_rf610()
         self.update_ppto_gtos_fte_rf602()
@@ -61,6 +62,13 @@ class UpdateSIIF():
         df = deuda_flotante_rdeu012.DeudaFlotanteRdeu012()
         df.update_sql_db(
             self.input_path + '/Deuda Flotante (rdeu)',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_deuda_flotante_rdeu012b2_c(self):
+        df = deuda_flotante_rdeu012b2_c.DeudaFlotanteRdeu012b2C()
+        df.update_sql_db(
+            self.input_path + '/Deuda Flotante TG (rdeu012b2_C)',
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
@@ -144,12 +152,20 @@ class UpdateSSCC():
     def update_all_sscc_tables(self):
         self.update_banco_invico()
         self.update_ctas_ctes()
+        self.update_sdo_final_banco_invico()
 
     # --------------------------------------------------
     def update_banco_invico(self):
         df = banco_invico.BancoINVICO()
         df.update_sql_db(
             self.input_path + '/Movimientos Generales SSCC',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_sdo_final_banco_invico(self):
+        df = sdo_final_banco_invico.SdoFinalBancoINVICO()
+        df.update_sql_db(
+            self.input_path + '/saldos_sscc',
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
