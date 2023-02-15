@@ -17,39 +17,48 @@ from .hangling_path import HanglingPath
 
 # --------------------------------------------------
 @dataclass
-class UploadEjecucionObras():
-    spreadsheet_key:str = '119DPlbkDm-MQ3-R4K8VGR_BNkHpDM1sgTn5CaiRc418'
-    wks_name:str = 'Hoja 1'
+class UploadGoogleSheet():
+    """Upload DataFrame to Google Sheets
+    :param path_credentials_file: json file download from Google
+    :param update_db: Should sqlite files be updated?
+    :param input_path: If update_db is True '/Base de Datos' path must be given
+    :param output_path: If update_db is True 'Python Output/SQLite Files' must be given
+    """
+    path_credentials_file:str
+    update_db:bool = False
+    input_path:str = None
+    output_path:str = None
+    gs:GoogleSheets = field(init=False, repr=False)
     df:pd.DataFrame = field(init=False, repr=False)
-    """Update and Upload Ejecución Presupuestaria to Google Sheet"""
 
     # --------------------------------------------------
-    def update_all_sscc_tables(self):
-        pass
-        # self.update_banco_invico()
-        # self.update_ctas_ctes()
-        # self.update_sdo_final_banco_invico()
+    def __post_init__(self):
+        if self.input_path == None or self.output_path == None:
+            self.update_db = False
+        self.gs = GoogleSheets(path_credentials_file=self.path_credentials_file)
 
-#     # --------------------------------------------------
-#     def update_banco_invico(self):
-#         df = banco_invico.BancoINVICO()
-#         df.update_sql_db(
-#             self.input_path + '/Movimientos Generales SSCC',
-#             output_path=self.output_path, clean_first=True)
+    # --------------------------------------------------
+    def upload_all_dfs(self):
+        """Update and Upload all DataFrames"""
+        self.upload_ejecucion_pres()
 
-#     # --------------------------------------------------
-#     def update_sdo_final_banco_invico(self):
-#         df = sdo_final_banco_invico.SdoFinalBancoINVICO()
-#         df.update_sql_db(
-#             self.input_path + '/saldos_sscc',
-#             output_path=self.output_path, clean_first=True)
-
-#     # --------------------------------------------------
-#     def update_ctas_ctes(self):
-#         df = ctas_ctes.CtasCtes()
-#         df.update_sql_db(
-#             self.input_path + '/cta_cte/cta_cte.xlsx',
-#             output_path=self.output_path, clean_first=True)
+    # --------------------------------------------------
+    def upload_ejecucion_pres(self):
+        """Update and Upload Ejecucion Presupuestaria"""
+        ejecucion_obras = EjecucionObras(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db
+        )
+        self.df = ejecucion_obras.import_siif_obras_desc()
+        spreadsheet_key = '1SRmgep84KGJNj_nKxiwXLe28gVUiIu2Uha4j_C7BzeU'
+        wks_name = 'siif_ejec_obras'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Ejecucion Obras --')
+        print(self.df.head())
 
 # --------------------------------------------------
 def get_args():
@@ -59,24 +68,11 @@ def get_args():
         formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
-        '-s', '--spreadsheet_key', 
-        metavar = "spreadsheet_key",
-        type=str,
-        help = "can be found in the URL of a previously created sheet")
-
-    parser.add_argument(
         '-c', '--credentials', 
         metavar = "json_credentials",
-        default='google_credentials.json',
+        default=None,
         type=str,
         help = "Google's json file credentials name. Must be in the same folder")
-
-    parser.add_argument(
-        '-w', '--wks_name', 
-        metavar = "worksheet_name",
-        default= None,
-        type=str,
-        help = "worksheet_name")
 
     parser.add_argument(
         '-i', '--input_path', 
@@ -100,6 +96,15 @@ def get_args():
 def main():
     """Let's try it"""
     args = get_args()
+
+    if args.credentials == None:
+        google_credentials_path = HanglingPath().get_invicodb_path()
+        google_credentials_path = os.path.join(
+            google_credentials_path, 'google_credentials.json'
+        )
+    else:
+        google_credentials_path = args.credentials
+
     if args.input_path == None:
         input_path = HanglingPath().get_update_path_input()
     else:
@@ -110,18 +115,13 @@ def main():
     else:
         output_path = args.output_path
 
-    test = EjecucionObras(
-        input_path=input_path, db_path=output_path,
-        update_db= True
+    test = UploadGoogleSheet(
+        path_credentials_file=google_credentials_path,
+        update_db=False,
+        input_path=input_path,
+        output_path=output_path
     )
-    df = test.import_siif_obras_desc()
-
-    gs = GoogleSheets(args.credentials)
-    gs.to_google_sheets(
-        df,  
-        spreadsheet_key = args.spreadsheet_key,
-        wks_name = args.wks_name
-    )
+    test.upload_ejecucion_pres()
 
 
 
