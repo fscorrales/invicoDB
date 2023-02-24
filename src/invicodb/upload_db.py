@@ -14,6 +14,7 @@ import pandas as pd
 from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
 from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
+from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
 from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
 from invicoctrlpy.recursos.control_recursos import ControlRecursos
 from invicodatpy.utils.google_sheets import GoogleSheets
@@ -53,7 +54,7 @@ class UploadGoogleSheet():
             - SIIF rf610
             - SIIF gto_rpa03g
             - SIIF rcg01_uejp
-            - SIIF rdeu012 (para netear Icaro)
+            - SIIF rdeu012
             - SIIF rfondo07tp
             - SIIF rci02
             - SIIF rcocc31 (
@@ -308,7 +309,7 @@ class UploadGoogleSheet():
             wks_name = wks_name
         )
         print('-- Control Recursos por Mes, Grupo y Cta Cte --')
-        print(self.df.tail())
+        print(self.df.head())
 
         # Control Recursos por Mes y Grupo
         self.df = control_recursos.control_mes_grupo()
@@ -349,6 +350,39 @@ class UploadGoogleSheet():
             wks_name = wks_name
         )
         print('-- SSCC Banco INVICO --')
+        print(self.df.head())
+
+    # --------------------------------------------------
+    def upload_control_haberes(self, ejercicio:str = None):
+        """Update and Upload Control Recursos
+        Update requires:
+            - SIIF rcg01_uejp
+            - SIIF gto_rpa03g
+            - SIIF rcocc31 (2122-1-2)
+            - SIIF rdeu
+            - SSCC Resumen General de Movimientos
+            - SSCC ctas_ctes (manual data)
+        """
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
+        control_haberes = ControlHaberes(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio_metodo
+        )
+        # Control Haberes Mensual
+        self.df = control_haberes.control_mes()
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1A9ypUkwm4kfLqUAwr6-55crcFElisOO9fOdI6iflMAc'
+        wks_name = 'control_mes'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Haberes mensual --')
         print(self.df.head())
 
     # --------------------------------------------------
@@ -440,8 +474,8 @@ def main():
 
     upload = UploadGoogleSheet(
         path_credentials_file=google_credentials_path,
-        ejercicio='2021',
-        update_db=False,
+        ejercicio='2023',
+        update_db=True,
         input_path=input_path,
         output_path=output_path
     )
