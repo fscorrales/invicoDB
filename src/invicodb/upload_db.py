@@ -481,10 +481,10 @@ def main():
     )
     # upload.upload_all_dfs()
     # upload.upload_ejecucion_pres()
-    # upload.upload_control_icaro()
+    upload.upload_control_icaro()
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_comprobantes_gastos()
-    upload.upload_control_recursos(ejercicio='2023')
+    # upload.upload_control_recursos(ejercicio='2023')
 
 
 # --------------------------------------------------

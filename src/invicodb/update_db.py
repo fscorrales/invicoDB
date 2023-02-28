@@ -14,6 +14,7 @@ from invicodatpy.sgf import *
 from invicodatpy.siif import *
 from invicodatpy.slave import *
 from invicodatpy.sscc import *
+from invicodatpy.sgv import *
 
 from .hangling_path import HanglingPath
 
@@ -203,6 +204,80 @@ class UpdateSlave():
         ).migrate_all()
 
 # --------------------------------------------------
+@dataclass
+class UpdateSGV():
+    """Read, process and write INVICO DB"""
+    input_path:str
+    output_path:str
+
+    # --------------------------------------------------
+    def update_all_sgv_tables(self):
+        self.update_barrios_nuevos()
+        self.update_resumen_facturado()
+        self.update_resumen_recaudado()
+        self.update_saldo_barrio_variacion()
+        self.update_saldo_barrio()
+        self.update_saldo_motivo()
+        self.update_saldo_motivo_entrega_viviendas()
+        self.update_saldo_recuperos_cobrar_variacion()
+
+    # --------------------------------------------------
+    def update_barrios_nuevos(self):
+        df = barrios_nuevos.BarriosNuevos()
+        df.update_sql_db(
+            self.input_path + '/Barrios Nuevos',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_resumen_facturado(self):
+        df = resumen_facturado.ResumenFacturado()
+        df.update_sql_db(
+            self.input_path + '/Resumen Facturado',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_resumen_recaudado(self):
+        df = resumen_recaudado.ResumenRecaudado()
+        df.update_sql_db(
+            self.input_path + '/Resumen Recaudado',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_saldo_barrio_variacion(self):
+        df = saldo_barrio_variacion.SaldoBarrioVariacion()
+        df.update_sql_db(
+            self.input_path + '/Evolucion de Saldo Por Barrio',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_saldo_barrio(self):
+        df = saldo_barrio.SaldoBarrio()
+        df.update_sql_db(
+            self.input_path + '/Saldo por Barrio',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_saldo_motivo(self):
+        df = saldo_motivo.SaldoMotivo()
+        df.update_sql_db(
+            self.input_path + '/Evolucion de Saldo Por Motivo',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_saldo_motivo_entrega_viviendas(self):
+        df = saldo_motivo_entrega_viviendas.SaldoMotivoEntregaViviendas()
+        df.update_sql_db(
+            self.input_path + '/Motivo Entrega de Viviendas',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_saldo_recuperos_cobrar_variacion(self):
+        df = saldo_recuperos_cobrar_variacion.SaldoRecuperosCobrarVariacion()
+        df.update_sql_db(
+            self.input_path + '/Variación de Saldos Recuperos A Cobrar',
+            output_path=self.output_path, clean_first=True)
+
+# --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
     parser = argparse.ArgumentParser(
@@ -241,28 +316,32 @@ def main():
     else:
         output_path = args.output_path
 
-    UpdateSIIF(
-        os.path.join(input_path, 'Reportes SIIF'), 
-        os.path.join(output_path, 'siif.sqlite')
-        ).update_all_siif_tables()
-    UpdateSGF(
-        os.path.join(input_path, 'Sistema Gestion Financiera'), 
-        os.path.join(output_path, 'sgf.sqlite')
-        ).update_all_sgf_tables()
-    UpdateSSCC(
-        os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
-        os.path.join(output_path,'sscc.sqlite')
-    ).update_all_sscc_tables()
-    UpdateIcaro(
-        os.path.join(HanglingPath().get_outside_path(),
-        'R Output/SQLite Files/ICARO.sqlite'), 
-        os.path.join(output_path, 'icaro.sqlite')
-        ).migrate_icaro()
-    UpdateSlave(
-        os.path.join(input_path, 'Slave/Slave.mdb'), 
-        os.path.join(output_path, 'slave.sqlite')
-        ).migrate_slave()
-
+    # UpdateSIIF(
+    #     os.path.join(input_path, 'Reportes SIIF'), 
+    #     os.path.join(output_path, 'siif.sqlite')
+    #     ).update_all_siif_tables()
+    # UpdateSGF(
+    #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
+    #     os.path.join(output_path, 'sgf.sqlite')
+    #     ).update_all_sgf_tables()
+    # UpdateSSCC(
+    #     os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
+    #     os.path.join(output_path,'sscc.sqlite')
+    # ).update_all_sscc_tables()
+    # UpdateIcaro(
+    #     os.path.join(HanglingPath().get_outside_path(),
+    #     'R Output/SQLite Files/ICARO.sqlite'), 
+    #     os.path.join(output_path, 'icaro.sqlite')
+    #     ).migrate_icaro()
+    # UpdateSlave(
+    #     os.path.join(input_path, 'Slave/Slave.mdb'), 
+    #     os.path.join(output_path, 'slave.sqlite')
+    #     ).migrate_slave()
+    UpdateSGV(
+        os.path.join(input_path, 'Gestión Vivienda GV/Sistema Recuperos GV'), 
+        os.path.join(output_path, 'sgv.sqlite')
+        ).update_all_sgv_tables()
+        
 # --------------------------------------------------
 if __name__ == '__main__':
     main()
