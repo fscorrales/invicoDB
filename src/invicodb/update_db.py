@@ -36,7 +36,8 @@ class UpdateSIIF():
         self.update_mayor_contable_rcocc31()
         self.update_ppto_gtos_desc_rf610()
         self.update_ppto_gtos_fte_rf602()
-        self.update_resumen_fdos_rfondo07tp() 
+        self.update_resumen_fdos_rfondo07tp()
+        self.update_detalle_partidas_rog01() 
 
     # --------------------------------------------------
     def update_comprobantes_gtos_rcg01_uejp(self):
@@ -99,6 +100,13 @@ class UpdateSIIF():
         df = resumen_fdos_rfondo07tp.ResumenFdosRfondo07tp()
         df.update_sql_db(
             self.input_path + '/Comprobantes de Fondos Regularizados por Tipo (rfondo07tp)',
+            output_path=self.output_path, clean_first=True)
+        
+    # --------------------------------------------------
+    def update_detalle_partidas_rog01(self):
+        df = detalle_partidas_rog01.DetallePartidasRog01()
+        df.update_sql_db(
+            self.input_path + '/Listado Partidas (rog01)',
             output_path=self.output_path, clean_first=True)
 
 # --------------------------------------------------
