@@ -15,8 +15,9 @@ from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
 from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
 from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
+from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import FondosPermCajasChicas
 from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
-from invicoctrlpy.recursos.control_recursos import ControlRecursos
+from invicoctrlpy.recursos.control_recursos.control_recursos import ControlRecursos
 from invicodatpy.utils.google_sheets import GoogleSheets
 
 from .hangling_path import HanglingPath
@@ -57,6 +58,7 @@ class UploadGoogleSheet():
             - SIIF rdeu012
             - SIIF rfondo07tp
             - SIIF rci02
+            - SIIF rog01
             - SIIF rcocc31 (
                 2111-1-2 Contratistas
                 2122-1-2 Retenciones
@@ -71,6 +73,7 @@ class UploadGoogleSheet():
         self.upload_comprobantes_gastos()
         self.upload_control_recursos()
         self.upload_control_retenciones()
+        self.upload_fondos_perm_cajas_chicas()
 
     # --------------------------------------------------
     def upload_ejecucion_pres(self):
@@ -416,6 +419,34 @@ class UploadGoogleSheet():
         print('-- Control Retenciones Icaro --')
         print(self.df.head())
 
+    # --------------------------------------------------
+    def upload_fondos_perm_cajas_chicas(self):
+        """Update and Upload Fondos Permanentes y Cajas Chicas
+        Update requires:
+            - SIIF rcg01_uejp
+            - SIIF gto_rpa03g
+            - SIIF rog01
+            - SSCC ctas_ctes (manual data)
+        """
+        fondos_perm = FondosPermCajasChicas(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=None
+        )
+
+        # Comprobantes SIIF Fondos Permanentes y Cajas Chicas
+        self.df = fondos_perm.import_siif_comprobantes_fondos_perm()
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1dF8K5gslpK47jjVgJjd-I6k_2QLV2OSSwJ3Le40sFxc'
+        wks_name = 'bd_siif_comprobantes'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Comprobantes SIIF Fondos Permanentes y Cajas Chicas --')
+        print(self.df.head())
+
 
 # --------------------------------------------------
 def get_args():
@@ -481,10 +512,11 @@ def main():
     )
     # upload.upload_all_dfs()
     # upload.upload_ejecucion_pres()
-    upload.upload_control_icaro()
+    # upload.upload_control_icaro()
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_comprobantes_gastos()
     # upload.upload_control_recursos(ejercicio='2023')
+    upload.upload_fondos_perm_cajas_chicas()
 
 
 # --------------------------------------------------
