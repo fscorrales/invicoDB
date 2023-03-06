@@ -420,7 +420,7 @@ class UploadGoogleSheet():
         print(self.df.head())
 
     # --------------------------------------------------
-    def upload_fondos_perm_cajas_chicas(self):
+    def upload_fondos_perm_cajas_chicas(self, ejercicio:list = None):
         """Update and Upload Fondos Permanentes y Cajas Chicas
         Update requires:
             - SIIF rcg01_uejp
@@ -428,9 +428,11 @@ class UploadGoogleSheet():
             - SIIF rog01
             - SSCC ctas_ctes (manual data)
         """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
         fondos_perm = FondosPermCajasChicas(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=None
+            update_db= self.update_db, ejercicio=ejercicio
         )
 
         # Comprobantes SIIF Fondos Permanentes y Cajas Chicas
@@ -516,7 +518,7 @@ def main():
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_comprobantes_gastos()
     # upload.upload_control_recursos(ejercicio='2023')
-    upload.upload_fondos_perm_cajas_chicas()
+    upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
 
 
 # --------------------------------------------------
