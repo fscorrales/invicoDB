@@ -227,6 +227,7 @@ class UpdateSGV():
         self.update_saldo_barrio()
         self.update_saldo_motivo()
         self.update_saldo_motivo_entrega_viviendas()
+        self.update_saldo_motivo_actualizacion_semestral()
         self.update_saldo_recuperos_cobrar_variacion()
 
     # --------------------------------------------------
@@ -276,7 +277,14 @@ class UpdateSGV():
         df = saldo_motivo_entrega_viviendas.SaldoMotivoEntregaViviendas()
         df.update_sql_db(
             self.input_path + '/Motivo Entrega de Viviendas',
-            output_path=self.output_path, clean_first=True)
+            output_path=self.output_path, clean_first=False)
+
+    # --------------------------------------------------
+    def update_saldo_motivo_actualizacion_semestral(self):
+        df = saldo_motivo_actualizacion_semestral.SaldoMotivoActualizacionSemestral()
+        df.update_sql_db(
+            self.input_path + '/Motivo Actualizacion Semestral',
+            output_path=self.output_path, clean_first=False)
 
     # --------------------------------------------------
     def update_saldo_recuperos_cobrar_variacion(self):
