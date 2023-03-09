@@ -68,6 +68,7 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
         """
         self.upload_ejecucion_pres()
+        self.upload_ejecucion_obras_fondos_prov()
         self.upload_planillometro()
         self.upload_control_icaro()
         self.upload_comprobantes_gastos()
@@ -143,7 +144,57 @@ class UploadGoogleSheet():
         print('-- Ejecucion Modulos Básicos por Convenio --')
         print(self.df.head())
 
-        # Planillometro SIIF
+    # --------------------------------------------------
+    def upload_ejecucion_obras_fondos_prov(self, ejercicio:list = None):
+        """Update and Upload Ejecucion Obras Fondos Prov
+        Update requires:
+            - SIIF rf602
+            - SIIF rf610
+            - Icaro
+        """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+        ejecucion_obras = EjecucionObras(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio
+        )
+
+        # Ejecucion Obras SIIF con Descripcion Unificada
+        self.df = ejecucion_obras.import_siif_obras_desc()
+        self.df = self.df.loc[self.df['fuente'] != '11']
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1oB0B2Z0SKL3RVXkgENAcfd4-zXte2geTZtpmTxOj_tg'
+        wks_name = 'siif_ejec_obras_desc_unif'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Ejecucion Obras SIIF con Descripcion Unificada --')
+        print(self.df.head())
+
+        # Ejecucion Icaro
+        self.df = ejecucion_obras.import_icaro_carga_desc(es_desc_siif=False)
+        self.df = self.df.loc[self.df['fuente'] != '11']
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df['estructura'] = self.df['actividad'] + '-' + self.df['partida']
+        # self.df = self.df.groupby([
+        #     'ejercicio', 'estructura', 'fuente',
+        #     'desc_prog', 'desc_subprog', 'desc_proy', 'desc_act',
+        #     'obra', 'proveedor'
+        # ]).importe.sum().to_frame()
+        
+        self.df.reset_index(drop=True, inplace=True)
+        spreadsheet_key = '1oB0B2Z0SKL3RVXkgENAcfd4-zXte2geTZtpmTxOj_tg'
+        wks_name = 'icaro'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Ejecucion Icaro --')
+        print(self.df.head())
 
     # --------------------------------------------------
     def upload_planillometro(self, ejercicio:str = None):
@@ -514,11 +565,12 @@ def main():
     )
     # upload.upload_all_dfs()
     # upload.upload_ejecucion_pres()
+    upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
     # upload.upload_control_icaro()
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_comprobantes_gastos()
     # upload.upload_control_recursos(ejercicio='2023')
-    upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
+    # upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
 
 
 # --------------------------------------------------
