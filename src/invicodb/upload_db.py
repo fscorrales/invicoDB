@@ -132,7 +132,7 @@ class UploadGoogleSheet():
         print('-- Ejecucion Icaro --')
         print(self.df.head())
 
-        # Ejecucion Modulos Basicos Icaro
+        # Ejecucion Modulos Basicos por Convenio
         self.df = ejecucion_obras.reporte_icaro_mod_basicos()
         spreadsheet_key = '1EqZmq2uYrc-rJxGuGJKKUTRqhCvTWMhtkhHDef7E55o'
         wks_name = 'mod_basicos_convenios'
@@ -142,6 +142,19 @@ class UploadGoogleSheet():
             wks_name = wks_name
         )
         print('-- Ejecucion Modulos Básicos por Convenio --')
+        print(self.df.head())
+
+        # Ejecucion Modulos Basicos Icaro
+        self.df = ejecucion_obras.import_icaro_mod_basicos(es_desc_siif=True)
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '195qPSga7cU1kx3z2-gadEWNC2eupdkbR-rb-O8SPWuA'
+        wks_name = 'mod_basicos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Ejecucion Modulos Básicos --')
         print(self.df.head())
 
     # --------------------------------------------------
@@ -564,8 +577,8 @@ def main():
         output_path=output_path
     )
     # upload.upload_all_dfs()
-    # upload.upload_ejecucion_pres()
-    upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
+    upload.upload_ejecucion_pres()
+    # upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
     # upload.upload_control_icaro()
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_comprobantes_gastos()
