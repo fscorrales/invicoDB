@@ -68,8 +68,8 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
         """
         self.upload_ejecucion_pres()
-        self.upload_ejecucion_obras_fondos_prov()
         self.upload_planillometro()
+        self.upload_ejecucion_obras_fondos_prov()
         self.upload_control_icaro()
         self.upload_comprobantes_gastos()
         self.upload_control_recursos()
@@ -145,8 +145,11 @@ class UploadGoogleSheet():
         print(self.df.head())
 
         # Ejecucion Modulos Basicos Icaro
-        self.df = ejecucion_obras.import_icaro_mod_basicos(es_desc_siif=True)
+        self.df = ejecucion_obras.import_icaro_mod_basicos(
+            es_desc_siif=True, neto_reg=False, neto_pa6=False
+        )
         self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df = self.df.fillna('')
         spreadsheet_key = '195qPSga7cU1kx3z2-gadEWNC2eupdkbR-rb-O8SPWuA'
         wks_name = 'mod_basicos'
         self.gs.to_google_sheets(
@@ -229,8 +232,8 @@ class UploadGoogleSheet():
 
         # Planillometro SIIF
         self.df = ejecucion_obras.reporte_planillometro(full_icaro=False, es_desc_siif=True)
-        spreadsheet_key = '1yn3-B3blPJmF8RknUEBs5xCQW1RrFTYvBxECF4PBt2M'
-        wks_name = 'siif'
+        spreadsheet_key = '1AYeTncc1ewP8Duj13t7o6HCwAHNEWILRMNQiZHAs82I'
+        wks_name = 'planillometro_siif'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
@@ -242,8 +245,8 @@ class UploadGoogleSheet():
 
         # Planillometro Icaro
         self.df = ejecucion_obras.reporte_planillometro(full_icaro=True, es_desc_siif=False)
-        spreadsheet_key = '1yn3-B3blPJmF8RknUEBs5xCQW1RrFTYvBxECF4PBt2M'
-        wks_name = 'icaro'
+        spreadsheet_key = '1AYeTncc1ewP8Duj13t7o6HCwAHNEWILRMNQiZHAs82I'
+        wks_name = 'planillometro_icaro'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
@@ -489,7 +492,7 @@ class UploadGoogleSheet():
         Update requires:
             - SIIF rcg01_uejp
             - SIIF gto_rpa03g
-            - SIIF rog01
+            - SIIF rog01 (solo una vez)
             - SSCC ctas_ctes (manual data)
         """
         if ejercicio == None:
@@ -576,15 +579,25 @@ def main():
         input_path=input_path,
         output_path=output_path
     )
-    # upload.upload_all_dfs()
+
+    # Requiere:
+    # SIIF rf602, SIIF rf610, Icaro
     upload.upload_ejecucion_pres()
-    # upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
-    # upload.upload_control_icaro()
-    # upload.upload_planillometro(ejercicio='2022')
-    # upload.upload_comprobantes_gastos()
-    # upload.upload_control_recursos(ejercicio='2023')
+    upload.upload_planillometro(ejercicio='2022')
+    upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
+
+    # Requiere:
+    # SIIF rcg01_uejp, SIIF gto_rpa03g
     # upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
 
+    #Adicionalmente a todo lo anterior, requiere:
+    # SIIF rfondo07tp
+    # upload.upload_control_icaro()    
+    # upload.upload_comprobantes_gastos()
+
+    # upload.upload_control_recursos(ejercicio='2023')
+    
+    # upload.upload_all_dfs()
 
 # --------------------------------------------------
 if __name__ == '__main__':
