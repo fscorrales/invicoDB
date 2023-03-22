@@ -17,6 +17,9 @@ __pycache__/
 # JSON extensions
 *.json
 
+# Executable extensions
+*.exe
+
 # Distribution / packaging
 .Python
 build/

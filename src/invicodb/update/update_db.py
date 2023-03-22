@@ -16,7 +16,7 @@ from invicodatpy.slave import *
 from invicodatpy.sscc import *
 from invicodatpy.sgv import *
 
-from .hangling_path import HanglingPath
+from ..hangling_path import HanglingPath
 
 
 # --------------------------------------------------
@@ -332,10 +332,10 @@ def main():
     else:
         output_path = args.output_path
 
-    # UpdateSIIF(
-    #     os.path.join(input_path, 'Reportes SIIF'), 
-    #     os.path.join(output_path, 'siif.sqlite')
-    #     ).update_all_siif_tables()
+    UpdateSIIF(
+        os.path.join(input_path, 'Reportes SIIF'), 
+        os.path.join(output_path, 'siif.sqlite')
+        ).update_ppto_gtos_fte_rf602()
     # UpdateSGF(
     #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
     #     os.path.join(output_path, 'sgf.sqlite')
@@ -353,13 +353,13 @@ def main():
     #     os.path.join(input_path, 'Slave/Slave.mdb'), 
     #     os.path.join(output_path, 'slave.sqlite')
     #     ).migrate_slave()
-    UpdateSGV(
-        os.path.join(input_path, 'Gestión Vivienda GV/Sistema Recuperos GV'), 
-        os.path.join(output_path, 'sgv.sqlite')
-        ).update_all_sgv_tables()
+    # UpdateSGV(
+    #     os.path.join(input_path, 'Gestión Vivienda GV/Sistema Recuperos GV'), 
+    #     os.path.join(output_path, 'sgv.sqlite')
+    #     ).update_all_sgv_tables()
         
 # --------------------------------------------------
 if __name__ == '__main__':
     main()
     # From invicoDB.src
-    # python -m invicodb.update_db
+    # python -m invicodb.update.update_db

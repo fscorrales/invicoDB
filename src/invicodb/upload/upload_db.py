@@ -20,7 +20,7 @@ from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
 from invicoctrlpy.recursos.control_recursos.control_recursos import ControlRecursos
 from invicodatpy.utils.google_sheets import GoogleSheets
 
-from .hangling_path import HanglingPath
+from ..hangling_path import HanglingPath
 
 
 # --------------------------------------------------
@@ -557,6 +557,9 @@ def main():
     if args.credentials == None:
         google_credentials_path = HanglingPath().get_invicodb_path()
         google_credentials_path = os.path.join(
+            google_credentials_path, 'upload'
+        )
+        google_credentials_path = os.path.join(
             google_credentials_path, 'google_credentials.json'
         )
     else:
@@ -588,13 +591,15 @@ def main():
 
     # Requiere:
     # SIIF rcg01_uejp, SIIF gto_rpa03g
-    # upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
+    upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
 
-    #Adicionalmente a todo lo anterior, requiere:
+    # Adicionalmente a todo lo anterior, requiere:
     # SIIF rfondo07tp
     # upload.upload_control_icaro()    
     # upload.upload_comprobantes_gastos()
 
+    # Requiere:
+    # SIIF rci0, SSCC Consulta General de Movimiento
     # upload.upload_control_recursos(ejercicio='2023')
     
     # upload.upload_all_dfs()
@@ -603,4 +608,4 @@ def main():
 if __name__ == '__main__':
     main()
     # From invicoDB.src
-    # python -m invicodb.upload_db
+    # python -m invicodb.upload.upload_db
