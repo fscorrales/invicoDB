@@ -53,10 +53,10 @@ class DownloadSIIF():
             self.download_comprobantes_gtos_rcg01_uejp()
             self.download_comprobantes_gtos_gpo_part_gto_rpa03g()
             self.download_resumen_fdos_rfondo07tp()
-            # self.download_comprobantes_rec_rci02()
-            # self.download_deuda_flotante_rdeu012()
+            self.download_comprobantes_rec_rci02()
+            self.download_deuda_flotante_rdeu012()
             # self.download_deuda_flotante_rdeu012b2_c()
-            # self.download_mayor_contable_rcocc31()
+            self.download_mayor_contable_rcocc31()
             # self.download_detalle_partidas_rog01()
         except Exception as e:
             print(f"Ocurrió un error: {e}, {type(e)}")
@@ -118,6 +118,45 @@ class DownloadSIIF():
         df.download_report(
             os.path.join(
                 self.output_path, 'Comprobantes de Fondos Regularizados por Tipo (rfondo07tp)'
+            )
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_comprobantes_rec_rci02(self):
+        df = comprobantes_rec_rci02.ComprobantesRecRci02(
+            siif = self.siif_connection
+        )
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Comprobantes de Recursos (rci02)'
+            )
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_deuda_flotante_rdeu012(self):
+        df = deuda_flotante_rdeu012.DeudaFlotanteRdeu012(
+            siif = self.siif_connection
+        )
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Deuda Flotante (rdeu)'
+            )
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_mayor_contable_rcocc31(self):
+        df = mayor_contable_rcocc31.MayorContableRcocc31(
+            siif = self.siif_connection
+        )
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Movimientos Contables (rcocc31)'
             )
         )
         if not self.download_all:
