@@ -67,14 +67,17 @@ class UploadGoogleSheet():
             - SSCC Resumen General de Movimientos
             - SSCC ctas_ctes (manual data)
         """
+        ejercicio_actual = str(dt.datetime.now().year)
         self.upload_ejecucion_pres()
         self.upload_planillometro()
-        self.upload_ejecucion_obras_fondos_prov()
+        ejercicios_varios = range(int(ejercicio_actual)-5, int(ejercicio_actual)+1)
+        ejercicios_varios = [str(x) for x in ejercicios_varios]
+        self.upload_ejecucion_obras_fondos_prov(ejercicios_varios)
+        self.upload_fondos_perm_cajas_chicas(ejercicios_varios)
         self.upload_control_icaro()
-        self.upload_comprobantes_gastos()
-        self.upload_control_recursos()
-        self.upload_control_retenciones()
-        self.upload_fondos_perm_cajas_chicas()
+        # self.upload_comprobantes_gastos()
+        # self.upload_control_recursos()
+        # self.upload_control_retenciones()
 
     # --------------------------------------------------
     def upload_ejecucion_pres(self):
@@ -578,20 +581,20 @@ def main():
     upload = UploadGoogleSheet(
         path_credentials_file=google_credentials_path,
         ejercicio='2023',
-        update_db=True,
+        update_db=False,
         input_path=input_path,
         output_path=output_path
-    )
+    ).upload_all_dfs()
 
     # Requiere:
     # SIIF rf602, SIIF rf610, Icaro
-    upload.upload_ejecucion_pres()
-    upload.upload_planillometro(ejercicio='2022')
-    upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
+    # upload.upload_ejecucion_pres()
+    # upload.upload_planillometro(ejercicio='2022')
+    # upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
 
     # Requiere:
     # SIIF rcg01_uejp, SIIF gto_rpa03g
-    upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
+    # upload.upload_fondos_perm_cajas_chicas(['2020', '2021', '2022', '2023'])
 
     # Adicionalmente a todo lo anterior, requiere:
     # SIIF rfondo07tp

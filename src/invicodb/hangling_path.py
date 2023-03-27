@@ -34,3 +34,8 @@ class HanglingPath():
         self.db_path = os.path.join(self.get_outside_path() ,'Python Output')
         self.db_path = os.path.join(self.db_path, 'SQLite Files')
         return self.db_path
+
+    # --------------------------------------------------
+    def get_exequiel_path(self):
+        dir_path = r'\\192.168.0.149\Compartida CONTABLE\R Apps (Compartida)\R Output\SQLite Files'
+        return dir_path

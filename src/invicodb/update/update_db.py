@@ -28,6 +28,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_all_siif_tables(self):
+        print("-- Iniciando proceso de actualización de DB SIIF --")
         self.update_comprobantes_gtos_rcg01_uejp()
         self.update_comprobantes_gtos_gpo_part_gto_rpa03g()
         self.update_comprobantes_rec_rci02()
@@ -41,6 +42,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_comprobantes_gtos_rcg01_uejp(self):
+        print("- Actualizando SIIF's rcg01_uejp -")
         df = comprobantes_gtos_rcg01_uejp.ComprobantesGtosRcg01Uejp()
         df.update_sql_db(
             self.input_path + '/Comprobantes de Gastos (rcg01_uejp)',
@@ -48,6 +50,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_comprobantes_gtos_gpo_part_gto_rpa03g(self):
+        print("- Actualizando SIIF's gto_rpa03g -")
         df = comprobantes_gtos_gpo_part_gto_rpa03g.ComprobantesGtosGpoPartGtoRpa03g()
         df.update_sql_db(
             self.input_path + '/Comprobantes de Gastos por Grupo Partida (gto_rpa03g)',
@@ -55,6 +58,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_comprobantes_rec_rci02(self):
+        print("- Actualizando SIIF's rec_rci02 -")
         df = comprobantes_rec_rci02.ComprobantesRecRci02()
         df.update_sql_db(
             self.input_path + '/Comprobantes de Recursos (rci02)',
@@ -62,6 +66,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_deuda_flotante_rdeu012(self):
+        print("- Actualizando SIIF's rdeu012 -")
         df = deuda_flotante_rdeu012.DeudaFlotanteRdeu012()
         df.update_sql_db(
             self.input_path + '/Deuda Flotante (rdeu)',
@@ -69,6 +74,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_deuda_flotante_rdeu012b2_c(self):
+        print("- Actualizando SIIF's rdeu012b2_c -")
         df = deuda_flotante_rdeu012b2_c.DeudaFlotanteRdeu012b2C()
         df.update_sql_db(
             self.input_path + '/Deuda Flotante TG (rdeu012b2_C)',
@@ -76,6 +82,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_mayor_contable_rcocc31(self):
+        print("- Actualizando SIIF's rcocc31 -")
         df = mayor_contable_rcocc31.MayorContableRcocc31()
         df.update_sql_db(
             self.input_path + '/Movimientos Contables (rcocc31)',
@@ -83,6 +90,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_ppto_gtos_desc_rf610(self):
+        print("- Actualizando SIIF's rf610 -")
         df = ppto_gtos_desc_rf610.PptoGtosDescRf610()
         df.update_sql_db(
             self.input_path + '/Ejecucion Presupuestaria con Descripcion (rf610)',
@@ -90,6 +98,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_ppto_gtos_fte_rf602(self):
+        print("- Actualizando SIIF's rf602 -")
         df = ppto_gtos_fte_rf602.PptoGtosFteRf602()
         df.update_sql_db(
             self.input_path + '/Ejecucion Presupuestaria con Fuente (rf602)',
@@ -97,6 +106,7 @@ class UpdateSIIF():
 
     # --------------------------------------------------
     def update_resumen_fdos_rfondo07tp(self):
+        print("- Actualizando SIIF's rfondo07tp -")
         df = resumen_fdos_rfondo07tp.ResumenFdosRfondo07tp()
         df.update_sql_db(
             self.input_path + '/Comprobantes de Fondos Regularizados por Tipo (rfondo07tp)',
@@ -104,6 +114,7 @@ class UpdateSIIF():
         
     # --------------------------------------------------
     def update_detalle_partidas_rog01(self):
+        print("- Actualizando SIIF's rog01 -")
         df = detalle_partidas_rog01.DetallePartidasRog01()
         df.update_sql_db(
             self.input_path + '/Listado Partidas (rog01)',
@@ -194,6 +205,7 @@ class UpdateIcaro():
 
     # --------------------------------------------------
     def migrate_icaro(self):
+        print("-- Actualizando Icaro' DB --")
         migrate_icaro.MigrateIcaro(
             self.input_path, self.output_path
         ).migrate_all()
@@ -332,10 +344,10 @@ def main():
     else:
         output_path = args.output_path
 
-    UpdateSIIF(
-        os.path.join(input_path, 'Reportes SIIF'), 
-        os.path.join(output_path, 'siif.sqlite')
-        ).update_ppto_gtos_fte_rf602()
+    # UpdateSIIF(
+    #     os.path.join(input_path, 'Reportes SIIF'), 
+    #     os.path.join(output_path, 'siif.sqlite')
+    #     ).update_all_siif_tables()
     # UpdateSGF(
     #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
     #     os.path.join(output_path, 'sgf.sqlite')
@@ -344,11 +356,11 @@ def main():
     #     os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
     #     os.path.join(output_path,'sscc.sqlite')
     # ).update_all_sscc_tables()
-    # UpdateIcaro(
-    #     os.path.join(HanglingPath().get_outside_path(),
-    #     'R Output/SQLite Files/ICARO.sqlite'), 
-    #     os.path.join(output_path, 'icaro.sqlite')
-    #     ).migrate_icaro()
+    UpdateIcaro(
+        os.path.join(HanglingPath().get_outside_path(),
+        'R Output/SQLite Files/ICARO.sqlite'), 
+        os.path.join(output_path, 'icaro.sqlite')
+        ).migrate_icaro()
     # UpdateSlave(
     #     os.path.join(input_path, 'Slave/Slave.mdb'), 
     #     os.path.join(output_path, 'slave.sqlite')
