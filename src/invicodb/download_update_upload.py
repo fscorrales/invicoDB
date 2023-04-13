@@ -9,8 +9,8 @@ Packages:
 import os
 
 from .hangling_path import HanglingPath
-from .download.download_db import DownloadSIIF, CopyIcaro
-from .update.update_db import UpdateSIIF, UpdateIcaro
+from .download.download_db import DownloadSIIF, DownloadSSCC, CopyIcaro
+from .update.update_db import UpdateSIIF, UpdateSSCC, UpdateIcaro
 from .upload.upload_db import UploadGoogleSheet
 
 
@@ -20,18 +20,28 @@ def main():
     
     # Download module
     output_path = HanglingPath().get_update_path_input()
-    siif_credentials_path = HanglingPath().get_invicodb_path()
-    siif_credentials_path = os.path.join(
-        siif_credentials_path, 'download'
+    credentials_path = HanglingPath().get_invicodb_path()
+    credentials_path = os.path.join(
+        credentials_path, 'download'
     )
+
     siif_credentials_path = os.path.join(
-        siif_credentials_path, 'siif_credentials.json'
+        credentials_path, 'siif_credentials.json'
     )
 
     DownloadSIIF(
         path_credentials_file=siif_credentials_path,
         output_path=os.path.join(output_path, 'Reportes SIIF')
         ).download_all_siif_tables()
+
+    invico_credentials_path = os.path.join(
+        credentials_path, 'invico_credentials.json'
+    )
+
+    DownloadSSCC(
+        path_credentials_file=invico_credentials_path,
+        output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
+        ).download_all_sscc_tables()
 
     output_path = HanglingPath().get_outside_path()
     exequiel_path = HanglingPath().get_exequiel_path()
@@ -49,6 +59,11 @@ def main():
         os.path.join(input_path, 'Reportes SIIF'), 
         os.path.join(output_path, 'siif.sqlite')
         ).update_all_siif_tables()
+
+    UpdateSSCC(
+        os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
+        os.path.join(output_path,'sscc.sqlite')
+    ).update_all_sscc_tables()
 
     UpdateIcaro(
         os.path.join(HanglingPath().get_outside_path(),

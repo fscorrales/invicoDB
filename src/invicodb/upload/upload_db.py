@@ -76,7 +76,7 @@ class UploadGoogleSheet():
         self.upload_fondos_perm_cajas_chicas(ejercicios_varios)
         self.upload_control_icaro()
         # self.upload_comprobantes_gastos()
-        # self.upload_control_recursos()
+        self.upload_control_recursos(ejercicio_actual)
         # self.upload_control_retenciones()
 
     # --------------------------------------------------
@@ -133,18 +133,6 @@ class UploadGoogleSheet():
             wks_name = wks_name
         )
         print('-- Ejecucion Icaro --')
-        print(self.df.head())
-
-        # Ejecucion Modulos Basicos por Convenio
-        self.df = ejecucion_obras.reporte_icaro_mod_basicos()
-        spreadsheet_key = '1EqZmq2uYrc-rJxGuGJKKUTRqhCvTWMhtkhHDef7E55o'
-        wks_name = 'mod_basicos_convenios'
-        self.gs.to_google_sheets(
-            self.df,  
-            spreadsheet_key = spreadsheet_key,
-            wks_name = wks_name
-        )
-        print('-- Ejecucion Modulos Básicos por Convenio --')
         print(self.df.head())
 
         # Ejecucion Modulos Basicos Icaro
@@ -602,7 +590,7 @@ def main():
     # upload.upload_comprobantes_gastos()
 
     # Requiere:
-    # SIIF rci0, SSCC Consulta General de Movimiento
+    # SIIF rci02, SSCC Consulta General de Movimiento
     # upload.upload_control_recursos(ejercicio='2023')
     
     # upload.upload_all_dfs()

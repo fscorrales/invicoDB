@@ -13,6 +13,7 @@ import shutil
 from dataclasses import dataclass, field
 
 from invicodatpy.siif import *
+from invicodatpy.sscc import *
 from selenium import webdriver
 
 from ..hangling_path import HanglingPath
@@ -78,7 +79,7 @@ class DownloadSIIF():
             # self.download_detalle_partidas_rog01()
         except Exception as e:
             print(f"Ocurrió un error: {e}, {type(e)}")
-            self.disconnect() 
+            self.siif_connection.disconnect() 
         finally:
             self.quit()
 
@@ -200,8 +201,80 @@ class DownloadSIIF():
             self.quit()
 
     # --------------------------------------------------
+    def remove_html_files(self):
+        root_dir = self.output_path
+        for folder, subfolders, files in os.walk(root_dir):
+            if folder != root_dir:
+                for f in files:
+                    if f.endswith(".html"):
+                        file_path = os.path.join(folder, f)
+                        os.remove(file_path)
+                        print(f"File: {file_path} removed")
+
+    # --------------------------------------------------
     def quit(self):
+        self.remove_html_files()
         self.siif_connection.disconnect()
+
+# --------------------------------------------------
+@dataclass
+class DownloadSSCC():
+    """Download SSCC' reports
+    :param path_credentials_file: json file with INVICO' credentials
+    :param input_path: If update_db is True '/Base de Datos' path must be given
+    :param output_path: If update_db is True 'Python Output/SQLite Files' must be given
+    """
+    path_credentials_file:str
+    output_path:str
+    download_all:bool = field(init=False, repr=False, default=False)
+    sscc_connection:connect_sscc.ConnectSSCC = field(init=False, repr=False)
+
+    # --------------------------------------------------
+    def __post_init__(self):
+        print('--- Iniciando descarga de DB SSCC ---')
+        print('- Connect to SSCC -')
+        if os.path.isfile(self.path_credentials_file):
+            with open(self.path_credentials_file) as json_file:
+                data_json = json.load(json_file)
+                self.sscc_connection = connect_sscc.ConnectSSCC(
+                    data_json['username'], data_json['password']
+                )
+            json_file.close()
+        else:
+            print('El ruta del archivo json con las credenciales de acceso no es válida')
+            print(self.path_credentials_file)
+
+    # --------------------------------------------------
+    def download_all_sscc_tables(self):
+        try:
+            print("- Iniciando descarga masiva de reportes SSCC -")
+            ejercicio_actual = str(dt.datetime.now().year)
+            ejercicio_anterior = str(dt.datetime.now().year - 1)
+            ejercicios = [ejercicio_anterior, ejercicio_actual]
+            self.download_all = True
+            self.download_banco_invico(ejercicios=ejercicios)
+        except Exception as e:
+            print(f"Ocurrió un error: {e}, {type(e)}")
+            self.quit() 
+        finally:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_banco_invico(self, ejercicios:list):
+        print("- Descargando SSCC's Resumen General de Movimientos -")
+        df = banco_invico.BancoINVICO(sscc = self.sscc_connection)
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Movimientos Generales SSCC'
+            ),
+            ejercicios = ejercicios
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def quit(self):
+        self.sscc_connection.quit()
 
 # --------------------------------------------------
 @dataclass
@@ -225,13 +298,6 @@ def get_args():
         formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
-        '-c', '--credentials', 
-        metavar = "json_credentials",
-        default=None,
-        type=str,
-        help = "SIIF's json file credentials name. Must be in the same folder")
-
-    parser.add_argument(
         '-o', '--output_path', 
         metavar = "output_path",
         default= None,
@@ -246,34 +312,41 @@ def main():
     """Let's try it"""
     args = get_args()
 
-    if args.credentials == None:
-        siif_credentials_path = HanglingPath().get_invicodb_path()
-        siif_credentials_path = os.path.join(
-            siif_credentials_path, 'download'
-        )
-        siif_credentials_path = os.path.join(
-            siif_credentials_path, 'siif_credentials.json'
-        )
-    else:
-        siif_credentials_path = args.credentials
-
     if args.output_path == None:
         output_path = HanglingPath().get_update_path_input()
     else:
         output_path = args.output_path
 
-    DownloadSIIF(
-        path_credentials_file=siif_credentials_path,
-        output_path=os.path.join(output_path, 'Reportes SIIF')
-        ).download_all_siif_tables()
-
-    output_path = HanglingPath().get_outside_path()
-    exequiel_path = HanglingPath().get_exequiel_path()
-
-    CopyIcaro(
-        exequiel_path = os.path.join(exequiel_path, 'ICARO.sqlite'),
-        my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
+    credentials_path = HanglingPath().get_invicodb_path()
+    credentials_path = os.path.join(
+        credentials_path, 'download'
     )
+    
+    # siif_credentials_path = os.path.join(
+    #     credentials_path, 'siif_credentials.json'
+    # )
+
+    # DownloadSIIF(
+    #     path_credentials_file=siif_credentials_path,
+    #     output_path=os.path.join(output_path, 'Reportes SIIF')
+    #     ).download_all_siif_tables()
+
+    invico_credentials_path = os.path.join(
+        credentials_path, 'invico_credentials.json'
+    )
+
+    DownloadSSCC(
+        path_credentials_file=invico_credentials_path,
+        output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
+        ).download_all_sscc_tables()
+
+    # output_path = HanglingPath().get_outside_path()
+    # exequiel_path = HanglingPath().get_exequiel_path()
+
+    # CopyIcaro(
+    #     exequiel_path = os.path.join(exequiel_path, 'ICARO.sqlite'),
+    #     my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
+    # )
         
 # --------------------------------------------------
 if __name__ == '__main__':

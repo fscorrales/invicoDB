@@ -171,12 +171,14 @@ class UpdateSSCC():
 
     # --------------------------------------------------
     def update_all_sscc_tables(self):
+        print("-- Iniciando proceso de actualización de DB SSCC --")
         self.update_banco_invico()
         self.update_ctas_ctes()
         self.update_sdo_final_banco_invico()
 
     # --------------------------------------------------
     def update_banco_invico(self):
+        print("- Actualizando SSCC's Banco INVICO -")
         df = banco_invico.BancoINVICO()
         df.update_sql_db(
             self.input_path + '/Movimientos Generales SSCC',
@@ -184,6 +186,7 @@ class UpdateSSCC():
 
     # --------------------------------------------------
     def update_sdo_final_banco_invico(self):
+        print("- Actualizando SSCC's Saldo Final Banco INVICO -")
         df = sdo_final_banco_invico.SdoFinalBancoINVICO()
         df.update_sql_db(
             self.input_path + '/saldos_sscc',
@@ -191,6 +194,7 @@ class UpdateSSCC():
 
     # --------------------------------------------------
     def update_ctas_ctes(self):
+        print("- Actualizando SSCC's Ctas Ctes -")
         df = ctas_ctes.CtasCtes()
         df.update_sql_db(
             self.input_path + '/cta_cte/cta_cte.xlsx',
