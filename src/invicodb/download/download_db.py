@@ -12,6 +12,7 @@ import os
 import shutil
 from dataclasses import dataclass, field
 
+from invicodatpy.sgf import *
 from invicodatpy.siif import *
 from invicodatpy.sscc import *
 from selenium import webdriver
@@ -51,9 +52,14 @@ class DownloadSIIF():
     def download_all_siif_tables(self):
         try:
             print("- Iniciando descarga masiva de reportes SIIF -")
-            ejercicio_actual = str(dt.datetime.now().year)
-            ejercicio_anterior = str(dt.datetime.now().year - 1)
-            ejercicios = [ejercicio_anterior, ejercicio_actual]
+            int_ejercicio = dt.datetime.now().year
+            ejercicio_actual = str(int_ejercicio)
+            fecha_limite = dt.datetime(year=int_ejercicio, month=3, day=31)
+            if dt.datetime.now() < fecha_limite:
+                ejercicio_anterior = str(dt.datetime.now().year - 1)
+                ejercicios = [ejercicio_anterior, ejercicio_actual]
+            else:
+                ejercicios = [ejercicio_actual]
             self.download_all = True
             self.download_ppto_gtos_desc_rf610(ejercicios)
             self.download_ppto_gtos_fte_rf602(ejercicios)
@@ -248,9 +254,14 @@ class DownloadSSCC():
     def download_all_sscc_tables(self):
         try:
             print("- Iniciando descarga masiva de reportes SSCC -")
-            ejercicio_actual = str(dt.datetime.now().year)
-            ejercicio_anterior = str(dt.datetime.now().year - 1)
-            ejercicios = [ejercicio_anterior, ejercicio_actual]
+            int_ejercicio = dt.datetime.now().year
+            ejercicio_actual = str(int_ejercicio)
+            fecha_limite = dt.datetime(year=int_ejercicio, month=1, day=31)
+            if dt.datetime.now() < fecha_limite:
+                ejercicio_anterior = str(dt.datetime.now().year - 1)
+                ejercicios = [ejercicio_anterior, ejercicio_actual]
+            else:
+                ejercicios = [ejercicio_actual]
             self.download_all = True
             self.download_banco_invico(ejercicios=ejercicios)
         except Exception as e:
@@ -278,6 +289,71 @@ class DownloadSSCC():
 
 # --------------------------------------------------
 @dataclass
+class DownloadSGF():
+    """Download SGF' reports
+    :param path_credentials_file: json file with INVICO' credentials
+    :param input_path: If update_db is True '/Base de Datos' path must be given
+    :param output_path: If update_db is True 'Python Output/SQLite Files' must be given
+    """
+    path_credentials_file:str
+    output_path:str
+    download_all:bool = field(init=False, repr=False, default=False)
+    sgf_connection:connect_sgf.ConnectSGF = field(init=False, repr=False)
+
+    # --------------------------------------------------
+    def __post_init__(self):
+        print('--- Iniciando descarga de DB SGF ---')
+        print('- Connect to SGF -')
+        if os.path.isfile(self.path_credentials_file):
+            with open(self.path_credentials_file) as json_file:
+                data_json = json.load(json_file)
+                self.sgf_connection = connect_sgf.ConnectSGF(
+                    data_json['username'], data_json['password']
+                )
+            json_file.close()
+        else:
+            print('El ruta del archivo json con las credenciales de acceso no es válida')
+            print(self.path_credentials_file)
+
+    # --------------------------------------------------
+    def download_all_sgf_tables(self):
+        try:
+            print("- Iniciando descarga masiva de reportes SGF -")
+            int_ejercicio = dt.datetime.now().year
+            ejercicio_actual = str(int_ejercicio)
+            fecha_limite = dt.datetime(year=int_ejercicio, month=1, day=31)
+            if dt.datetime.now() < fecha_limite:
+                ejercicio_anterior = str(dt.datetime.now().year - 1)
+                ejercicios = [ejercicio_anterior, ejercicio_actual]
+            else:
+                ejercicios = [ejercicio_actual]
+            self.download_all = True
+            self.download_resumen_rend_prov(ejercicios=ejercicios)
+        except Exception as e:
+            print(f"Ocurrió un error: {e}, {type(e)}")
+            self.quit() 
+        finally:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_resumen_rend_prov(self, ejercicios:list):
+        print("- Descargando SGF's Resumen Rendiciones Proveedores -")
+        df = resumen_rend_prov.ResumenRendProv(sgf = self.sgf_connection)
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Resumen de Rendiciones SGF'
+            ),
+            ejercicios = ejercicios
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def quit(self):
+        self.sgf_connection.quit()
+
+# --------------------------------------------------
+@dataclass
 class CopyIcaro():
     """Copy Icaro DB from Exequiel's PC to mine
     :param exequiel_path
@@ -288,8 +364,10 @@ class CopyIcaro():
 
     def __post_init__(self):
         print("- Copiando Icaro desde la PC de Exequiel -")
-        shutil.copy(self.exequiel_path, self.my_path, follow_symlinks=True)
-
+        try:
+            shutil.copy(self.exequiel_path, self.my_path, follow_symlinks=True)
+        except Exception as e:
+            print(f"No se pudo copiar ICARO por el siguiente error: {e}, {type(e)}")
 # --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
@@ -335,10 +413,15 @@ def main():
         credentials_path, 'invico_credentials.json'
     )
 
-    DownloadSSCC(
+    # DownloadSSCC(
+    #     path_credentials_file=invico_credentials_path,
+    #     output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
+    #     ).download_all_sscc_tables()
+
+    DownloadSGF(
         path_credentials_file=invico_credentials_path,
-        output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
-        ).download_all_sscc_tables()
+        output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
+        ).download_all_sgf_tables()
 
     # output_path = HanglingPath().get_outside_path()
     # exequiel_path = HanglingPath().get_exequiel_path()
