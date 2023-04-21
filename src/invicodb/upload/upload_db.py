@@ -76,7 +76,7 @@ class UploadGoogleSheet():
         self.upload_fondos_perm_cajas_chicas(ejercicios_varios)
         self.upload_control_icaro()
         # self.upload_comprobantes_gastos()
-        self.upload_control_recursos(ejercicio_actual)
+        self.upload_control_recursos(ejercicio = '')
         # self.upload_control_retenciones()
 
     # --------------------------------------------------
@@ -360,29 +360,16 @@ class UploadGoogleSheet():
             update_db= self.update_db, ejercicio=ejercicio_metodo
         )
         # Control Recursos por Mes, Grupo y Cta Cte
-        self.df = control_recursos.control_mes_grupo_cta_cte()
+        self.df = control_recursos.control_recursos()
         self.df = self.df.fillna('')
         spreadsheet_key = '1u_I5wN3w_rGX6rWIsItXkmwfIEuSox6ZsmKYbMZ2iUY'
-        wks_name = 'control_mes_grupo_cta_cte'
+        wks_name = 'control_recursos'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
             wks_name = wks_name
         )
         print('-- Control Recursos por Mes, Grupo y Cta Cte --')
-        print(self.df.head())
-
-        # Control Recursos por Mes y Grupo
-        self.df = control_recursos.control_mes_grupo()
-        self.df = self.df.fillna('')
-        spreadsheet_key = '1u_I5wN3w_rGX6rWIsItXkmwfIEuSox6ZsmKYbMZ2iUY'
-        wks_name = 'control_mes_grupo'
-        self.gs.to_google_sheets(
-            self.df,  
-            spreadsheet_key = spreadsheet_key,
-            wks_name = wks_name
-        )
-        print('-- Control Recursos por Mes y Grupo --')
         print(self.df.head())
 
         # SIIF Recursos
@@ -399,18 +386,51 @@ class UploadGoogleSheet():
         print('-- SIIF Recursos --')
         print(self.df.head())
 
+        # SIIF Recursos Agrupado
+        self.df = control_recursos.import_siif_rci02()
+        self.df = self.df.groupby(
+            ['ejercicio', 'mes', 'fuente', 'cta_cte', 'grupo',
+            'es_remanente', 'es_invico']
+        ).importe.sum().to_frame()
+        self.df.reset_index(drop=False, inplace=True)
+        spreadsheet_key = '1u_I5wN3w_rGX6rWIsItXkmwfIEuSox6ZsmKYbMZ2iUY'
+        wks_name = 'siif_recursos_group'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SIIF Recursos Agrupado --')
+        print(self.df.head())
+
         # SSCC Banco INVICO
         self.df = control_recursos.import_banco_invico()
         self.df = self.df.fillna('')
         self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
         spreadsheet_key = '1u_I5wN3w_rGX6rWIsItXkmwfIEuSox6ZsmKYbMZ2iUY'
-        wks_name = 'banco_invico'
+        wks_name = 'banco_ingresos'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
             wks_name = wks_name
         )
         print('-- SSCC Banco INVICO --')
+        print(self.df.head())
+
+        # SIIF Banco INVICO Agrupado
+        self.df = control_recursos.import_banco_invico()
+        self.df = self.df.groupby(
+            ['ejercicio', 'mes', 'cta_cte','grupo', 'imputacion']
+        ).importe.sum().to_frame()
+        self.df.reset_index(drop=False, inplace=True)
+        spreadsheet_key = '1u_I5wN3w_rGX6rWIsItXkmwfIEuSox6ZsmKYbMZ2iUY'
+        wks_name = 'banco_ingresos_group'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SIIF Banco INVICO Agrupado --')
         print(self.df.head())
 
     # --------------------------------------------------
@@ -572,7 +592,7 @@ def main():
         update_db=False,
         input_path=input_path,
         output_path=output_path
-    ).upload_all_dfs()
+    )
 
     # Requiere:
     # SIIF rf602, SIIF rf610, Icaro
@@ -591,7 +611,7 @@ def main():
 
     # Requiere:
     # SIIF rci02, SSCC Consulta General de Movimiento
-    # upload.upload_control_recursos(ejercicio='2023')
+    upload.upload_control_recursos(ejercicio = '')
     
     # upload.upload_all_dfs()
 

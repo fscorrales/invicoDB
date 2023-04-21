@@ -74,7 +74,7 @@ def main():
     UpdateSGF(
         os.path.join(input_path, 'Sistema Gestion Financiera'), 
         os.path.join(output_path,'sgf.sqlite')
-    ).update_all_sscc_tables()
+    ).update_all_sgf_tables()
 
     UpdateIcaro(
         os.path.join(HanglingPath().get_outside_path(),
