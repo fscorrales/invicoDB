@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 import pandas as pd
 from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
+from invicoctrlpy.gastos.ejecucion_gastos.ejecucion_gastos import EjecucionGastos
 from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
 from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
 from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import FondosPermCajasChicas
@@ -68,16 +69,62 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
         """
         ejercicio_actual = str(dt.datetime.now().year)
-        self.upload_ejecucion_pres()
-        self.upload_planillometro()
         ejercicios_varios = range(int(ejercicio_actual)-5, int(ejercicio_actual)+1)
         ejercicios_varios = [str(x) for x in ejercicios_varios]
+        self.upload_ejecucion_gtos(ejercicios_varios)
+        self.upload_ejecucion_pres()
+        self.upload_planillometro()
         self.upload_ejecucion_obras_fondos_prov(ejercicios_varios)
         self.upload_fondos_perm_cajas_chicas(ejercicios_varios)
         self.upload_control_icaro()
         # self.upload_comprobantes_gastos()
-        self.upload_control_recursos(ejercicio = '')
+        self.upload_control_recursos(ejercicios_varios)
         # self.upload_control_retenciones()
+
+    # --------------------------------------------------
+    def upload_ejecucion_gtos(self, ejercicio:str = None):
+        """Update and Upload Ejecucion Gastos
+        Update requires:
+            - SIIF rf602
+            - SIIF rf610
+            - SIIF gto_rpa03g
+            - SIIF rcg01_uejp
+        """
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
+        ejecucion_gastos = EjecucionGastos(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio_metodo
+        )
+
+        # Ejecucion Gastos SIIF
+        self.df = ejecucion_gastos.import_siif_gtos_desc()
+        spreadsheet_key = '1SRmgep84KGJNj_nKxiwXLe28gVUiIu2Uha4j_C7BzeU'
+        wks_name = 'siif_ejec_gastos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Ejecucion Gastos SIIF --')
+        print(self.df.head())
+
+        # Comprobantes Gastos SIIF
+        self.df = ejecucion_gastos.import_siif_comprobantes()
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1SRmgep84KGJNj_nKxiwXLe28gVUiIu2Uha4j_C7BzeU'
+        wks_name = 'siif_gastos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Comprobantes Gastos SIIF --')
+        print(self.df.head())
 
     # --------------------------------------------------
     def upload_ejecucion_pres(self):
@@ -596,6 +643,7 @@ def main():
 
     # Requiere:
     # SIIF rf602, SIIF rf610, Icaro
+    upload.upload_ejecucion_gtos(['2019','2020', '2021', '2022', '2023'])
     # upload.upload_ejecucion_pres()
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
@@ -611,7 +659,7 @@ def main():
 
     # Requiere:
     # SIIF rci02, SSCC Consulta General de Movimiento
-    upload.upload_control_recursos(ejercicio = '')
+    # upload.upload_control_recursos(['2020', '2021', '2022', '2023'])
     
     # upload.upload_all_dfs()
 

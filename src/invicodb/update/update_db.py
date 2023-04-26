@@ -348,18 +348,18 @@ def main():
     else:
         output_path = args.output_path
 
-    # UpdateSIIF(
-    #     os.path.join(input_path, 'Reportes SIIF'), 
-    #     os.path.join(output_path, 'siif.sqlite')
-    #     ).update_all_siif_tables()
-    # UpdateSGF(
-    #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
-    #     os.path.join(output_path, 'sgf.sqlite')
-    #     ).update_all_sgf_tables()
-    # UpdateSSCC(
-    #     os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
-    #     os.path.join(output_path,'sscc.sqlite')
-    # ).update_all_sscc_tables()
+    UpdateSIIF(
+        os.path.join(input_path, 'Reportes SIIF'), 
+        os.path.join(output_path, 'siif.sqlite')
+        ).update_all_siif_tables()
+    UpdateSGF(
+        os.path.join(input_path, 'Sistema Gestion Financiera'), 
+        os.path.join(output_path, 'sgf.sqlite')
+        ).update_all_sgf_tables()
+    UpdateSSCC(
+        os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
+        os.path.join(output_path,'sscc.sqlite')
+    ).update_all_sscc_tables()
     UpdateIcaro(
         os.path.join(HanglingPath().get_outside_path(),
         'R Output/SQLite Files/ICARO.sqlite'), 
