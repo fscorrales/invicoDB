@@ -76,7 +76,7 @@ class UploadGoogleSheet():
         self.upload_planillometro()
         self.upload_ejecucion_obras_fondos_prov(ejercicios_varios)
         self.upload_fondos_perm_cajas_chicas(ejercicios_varios)
-        self.upload_control_icaro()
+        self.upload_control_icaro(ejercicios_varios)
         # self.upload_comprobantes_gastos()
         self.upload_control_recursos(ejercicios_varios)
         # self.upload_control_retenciones()
@@ -295,7 +295,7 @@ class UploadGoogleSheet():
 
 
     # --------------------------------------------------
-    def upload_control_icaro(self):
+    def upload_control_icaro(self, ejercicio:str = None):
         """Update and Upload Control Icaro
         Update requires:
             - Icaro
@@ -305,13 +305,20 @@ class UploadGoogleSheet():
             - SIIF rfondo07tp
             - SSCC ctas_ctes (manual data)
         """
+
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
         icaro_vs_siif = IcaroVsSIIF(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=self.ejercicio
+            update_db= self.update_db, ejercicio=ejercicio_metodo
         )
 
         # Control Ejecucion Anual
         self.df = icaro_vs_siif.control_ejecucion_anual()
+        self.df = self.df.fillna(0)
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
         wks_name = 'control_ejecucion_anual'
         self.gs.to_google_sheets(
@@ -324,6 +331,7 @@ class UploadGoogleSheet():
 
         # Control Comprobantes
         self.df = icaro_vs_siif.control_comprobantes()
+        self.df = self.df.fillna('')
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
         wks_name = 'control_comprobantes'
         self.gs.to_google_sheets(
@@ -336,6 +344,7 @@ class UploadGoogleSheet():
 
         # Control PA6
         self.df = icaro_vs_siif.control_pa6()
+        self.df = self.df.fillna('')
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
         wks_name = 'control_pa6'
         self.gs.to_google_sheets(
@@ -643,7 +652,7 @@ def main():
 
     # Requiere:
     # SIIF rf602, SIIF rf610, Icaro
-    upload.upload_ejecucion_gtos(['2019','2020', '2021', '2022', '2023'])
+    # upload.upload_ejecucion_gtos(['2019','2020', '2021', '2022', '2023'])
     # upload.upload_ejecucion_pres()
     # upload.upload_planillometro(ejercicio='2022')
     # upload.upload_ejecucion_obras_fondos_prov(['2018','2019','2020', '2021', '2022', '2023'])
@@ -654,7 +663,7 @@ def main():
 
     # Adicionalmente a todo lo anterior, requiere:
     # SIIF rfondo07tp
-    # upload.upload_control_icaro()    
+    upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
     # upload.upload_comprobantes_gastos()
 
     # Requiere:
