@@ -15,10 +15,12 @@ from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
 from invicoctrlpy.gastos.ejecucion_gastos.ejecucion_gastos import EjecucionGastos
 from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
+from invicoctrlpy.gastos.control_obras.control_obras import ControlObras
 from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
 from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import FondosPermCajasChicas
 from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
 from invicoctrlpy.recursos.control_recursos.control_recursos import ControlRecursos
+
 from invicodatpy.utils.google_sheets import GoogleSheets
 
 from ..hangling_path import HanglingPath
@@ -79,6 +81,8 @@ class UploadGoogleSheet():
         self.upload_control_icaro(ejercicios_varios)
         # self.upload_comprobantes_gastos()
         self.upload_control_recursos(ejercicios_varios)
+        self.upload_control_obras(ejercicios_varios)
+        self.upload_control_haberes(ejercicios_varios)
         # self.upload_control_retenciones()
 
     # --------------------------------------------------
@@ -490,7 +494,7 @@ class UploadGoogleSheet():
         print(self.df.head())
 
     # --------------------------------------------------
-    def upload_control_haberes(self, ejercicio:str = None):
+    def upload_control_haberes(self, ejercicio:list = None):
         """Update and Upload Control Recursos
         Update requires:
             - SIIF rcg01_uejp
@@ -501,16 +505,14 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
         """
         if ejercicio == None:
-            ejercicio_metodo = self.ejercicio
-        else:
-            ejercicio_metodo = ejercicio
+            ejercicio = self.ejercicio
 
         control_haberes = ControlHaberes(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            update_db= self.update_db, ejercicio=ejercicio
         )
         # Control Haberes Mensual
-        self.df = control_haberes.control_mes()
+        self.df = control_haberes.control_cruzado()
         self.df = self.df.fillna('')
         spreadsheet_key = '1A9ypUkwm4kfLqUAwr6-55crcFElisOO9fOdI6iflMAc'
         wks_name = 'control_mes'
@@ -583,6 +585,35 @@ class UploadGoogleSheet():
         print('-- Comprobantes SIIF Fondos Permanentes y Cajas Chicas --')
         print(self.df.head())
 
+    # --------------------------------------------------
+    def upload_control_obras(self, ejercicio:list = None):
+        """Update and Upload Control Obras
+        Update requires:
+            - Icaro
+            - SIIF rdeu012 (para netear Icaro)
+            - SGF Resumen Rend por Proveedor
+        """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+        control_obras = ControlObras(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio
+        )
+
+        # Control Obras por Ejercicio, Mes, Cta. Cte. y CUIT
+        self.df = control_obras.control_cruzado(
+            groupby_cols=['ejercicio', 'mes', 'cta_cte', 'cuit']
+        )
+        self.df = self.df.fillna('')
+        spreadsheet_key = '16v2ovmQnS1v73-WxTOK6b9Tx9DRugGc70ufpjVi-rPA'
+        wks_name = 'control_mes_cta_cte_cuit_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Obras por Ejercicio, Mes, Cta. Cte. y CUIT --')
+        print(self.df.head())
 
 # --------------------------------------------------
 def get_args():
@@ -663,12 +694,20 @@ def main():
 
     # Adicionalmente a todo lo anterior, requiere:
     # SIIF rfondo07tp
-    upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
+    # upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
     # upload.upload_comprobantes_gastos()
 
     # Requiere:
     # SIIF rci02, SSCC Consulta General de Movimiento
     # upload.upload_control_recursos(['2020', '2021', '2022', '2023'])
+
+    # Requiere
+    # Icaro, rdeu012, SGF Resumen Rend por Proveedor
+    # upload.upload_control_obras(['2020', '2021', '2022', '2023'])
+
+    # Requiere
+    # 
+    upload.upload_control_haberes(['2020', '2021', '2022', '2023'])
     
     # upload.upload_all_dfs()
 
