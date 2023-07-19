@@ -67,6 +67,7 @@ class DownloadSIIF():
             self.download_comprobantes_gtos_gpo_part_gto_rpa03g(ejercicios)
             self.download_resumen_fdos_rfondo07tp(ejercicios)
             self.download_comprobantes_rec_rci02(ejercicios)
+            self.download_ppto_rec_ri102(ejercicios)
             self.download_mayor_contable_rcocc31(
                 ejercicios, 
                 ctas_contables = [
@@ -167,6 +168,21 @@ class DownloadSIIF():
         df.download_report(
             os.path.join(
                 self.output_path, 'Comprobantes de Recursos (rci02)'
+            ),
+            ejercicios= ejercicios
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_ppto_rec_ri102(self, ejercicios:list):
+        print("- Descargando SIIF's ri102 -")
+        df = ppto_rec_ri102.PptoRecRi102(
+            siif = self.siif_connection
+        )
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Ejecucion Presupuestaria Recursos por Codigo (ri102)'
             ),
             ejercicios= ejercicios
         )
@@ -401,14 +417,14 @@ def main():
         credentials_path, 'download'
     )
     
-    # siif_credentials_path = os.path.join(
-    #     credentials_path, 'siif_credentials.json'
-    # )
+    siif_credentials_path = os.path.join(
+        credentials_path, 'siif_credentials.json'
+    )
 
-    # DownloadSIIF(
-    #     path_credentials_file=siif_credentials_path,
-    #     output_path=os.path.join(output_path, 'Reportes SIIF')
-    #     ).download_all_siif_tables()
+    DownloadSIIF(
+        path_credentials_file=siif_credentials_path,
+        output_path=os.path.join(output_path, 'Reportes SIIF')
+        ).download_all_siif_tables()
 
     invico_credentials_path = os.path.join(
         credentials_path, 'invico_credentials.json'
@@ -419,10 +435,10 @@ def main():
     #     output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
     #     ).download_all_sscc_tables()
 
-    DownloadSGF(
-        path_credentials_file=invico_credentials_path,
-        output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
-        ).download_all_sgf_tables()
+    # DownloadSGF(
+    #     path_credentials_file=invico_credentials_path,
+    #     output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
+    #     ).download_all_sgf_tables()
 
     # output_path = HanglingPath().get_outside_path()
     # exequiel_path = HanglingPath().get_exequiel_path()

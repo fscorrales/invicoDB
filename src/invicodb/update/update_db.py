@@ -35,6 +35,7 @@ class UpdateSIIF():
         self.update_deuda_flotante_rdeu012()
         self.update_deuda_flotante_rdeu012b2_c()
         self.update_mayor_contable_rcocc31()
+        self.update_ppto_rec_ri102()
         self.update_ppto_gtos_desc_rf610()
         self.update_ppto_gtos_fte_rf602()
         self.update_resumen_fdos_rfondo07tp()
@@ -86,6 +87,14 @@ class UpdateSIIF():
         df = mayor_contable_rcocc31.MayorContableRcocc31()
         df.update_sql_db(
             self.input_path + '/Movimientos Contables (rcocc31)',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_ppto_rec_ri102(self):
+        print("- Actualizando SIIF's ri102 -")
+        df = ppto_rec_ri102.PptoRecRi102()
+        df.update_sql_db(
+            self.input_path + '/Ejecucion Presupuestaria Recursos por Codigo (ri102)',
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
@@ -348,14 +357,14 @@ def main():
     else:
         output_path = args.output_path
 
-    # UpdateSIIF(
-    #     os.path.join(input_path, 'Reportes SIIF'), 
-    #     os.path.join(output_path, 'siif.sqlite')
-    #     ).update_all_siif_tables()
-    UpdateSGF(
-        os.path.join(input_path, 'Sistema Gestion Financiera'), 
-        os.path.join(output_path, 'sgf.sqlite')
-        ).update_all_sgf_tables()
+    UpdateSIIF(
+        os.path.join(input_path, 'Reportes SIIF'), 
+        os.path.join(output_path, 'siif.sqlite')
+        ).update_all_siif_tables()
+    # UpdateSGF(
+    #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
+    #     os.path.join(output_path, 'sgf.sqlite')
+    #     ).update_all_sgf_tables()
     # UpdateSSCC(
     #     os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
     #     os.path.join(output_path,'sscc.sqlite')

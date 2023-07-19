@@ -446,6 +446,19 @@ class UploadGoogleSheet():
         print('-- SIIF Recursos --')
         print(self.df.head())
 
+        # SIIF Recursos Anual por Código
+        self.df = control_recursos.import_siif_ri102()
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1u_I5wN3w_rGX6rWIsItXkmwfIEuSox6ZsmKYbMZ2iUY'
+        wks_name = 'siif_recursos_cod'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SIIF Recursos Anual por Código --')
+        print(self.df.head())
+
         # SIIF Recursos Agrupado
         self.df = control_recursos.import_siif_rci02()
         self.df = self.df.groupby(
@@ -698,8 +711,8 @@ def main():
     # upload.upload_comprobantes_gastos()
 
     # Requiere:
-    # SIIF rci02, SSCC Consulta General de Movimiento
-    # upload.upload_control_recursos(['2020', '2021', '2022', '2023'])
+    # SIIF rci02, SIIF ri102, SSCC Consulta General de Movimiento
+    upload.upload_control_recursos(['2020', '2021', '2022', '2023'])
 
     # Requiere
     # Icaro, rdeu012, SGF Resumen Rend por Proveedor
@@ -707,7 +720,7 @@ def main():
 
     # Requiere
     # 
-    upload.upload_control_haberes(['2020', '2021', '2022', '2023'])
+    # upload.upload_control_haberes(['2020', '2021', '2022', '2023'])
     
     # upload.upload_all_dfs()
 
