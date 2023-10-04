@@ -11,16 +11,19 @@ import os
 from dataclasses import dataclass, field
 
 import pandas as pd
+from invicoctrlpy.banco.flujo_caja import FlujoCaja
+from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
+from invicoctrlpy.gastos.control_obras.control_obras import ControlObras
 from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
-from invicoctrlpy.gastos.ejecucion_gastos.ejecucion_gastos import EjecucionGastos
+from invicoctrlpy.gastos.ejecucion_gastos.ejecucion_gastos import \
+    EjecucionGastos
 from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
-from invicoctrlpy.gastos.control_obras.control_obras import ControlObras
-from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
-from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import FondosPermCajasChicas
+from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import \
+    FondosPermCajasChicas
 from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
-from invicoctrlpy.recursos.control_recursos.control_recursos import ControlRecursos
-
+from invicoctrlpy.recursos.control_recursos.control_recursos import \
+    ControlRecursos
 from invicodatpy.utils.google_sheets import GoogleSheets
 
 from ..hangling_path import HanglingPath
@@ -54,6 +57,7 @@ class UploadGoogleSheet():
         """Update and Upload all DataFrames
         Update requires:
             - Icaro
+            - SIIF rfp_p605b
             - SIIF rf602
             - SIIF rf610
             - SIIF gto_rpa03g
@@ -71,8 +75,11 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
         """
         ejercicio_actual = str(dt.datetime.now().year)
+        ejercicio_anterior = str(dt.datetime.now().year - 1)
+        ejercicio_siguiente = str(dt.datetime.now().year + 1)
         ejercicios_varios = range(int(ejercicio_actual)-5, int(ejercicio_actual)+1)
         ejercicios_varios = [str(x) for x in ejercicios_varios]
+        self.upload_formulacion_gtos([ejercicio_actual, ejercicio_siguiente])
         self.upload_ejecucion_gtos(ejercicios_varios)
         self.upload_ejecucion_pres()
         self.upload_planillometro()
@@ -81,9 +88,42 @@ class UploadGoogleSheet():
         self.upload_control_icaro(ejercicios_varios)
         # self.upload_comprobantes_gastos()
         self.upload_control_recursos(ejercicios_varios)
+        self.upload_flujo_caja(ejercicios_varios)
         self.upload_control_obras(ejercicios_varios)
         self.upload_control_haberes(ejercicios_varios)
-        # self.upload_control_retenciones()
+        self.upload_control_retenciones([ejercicio_actual, ejercicio_anterior])
+
+    # --------------------------------------------------
+    def upload_formulacion_gtos(self, ejercicio:str = None):
+        """Update and Upload Formulacion Gastos
+        Update requires:
+            - SIIF rfp_p605b
+            - SIIF rf602
+            - SIIF rf610
+            - SIIF gto_rpa03g
+            - SIIF rcg01_uejp
+        """
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
+        ejecucion_gastos = EjecucionGastos(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio_metodo
+        )
+
+        # Formulación Gastos SIIF
+        self.df = ejecucion_gastos.import_siif_rfp_p605b()
+        spreadsheet_key = '1SRmgep84KGJNj_nKxiwXLe28gVUiIu2Uha4j_C7BzeU'
+        wks_name = 'siif_form_gastos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Formulación Gastos SIIF --')
+        print(self.df.head())
 
     # --------------------------------------------------
     def upload_ejecucion_gtos(self, ejercicio:str = None):
@@ -282,6 +322,20 @@ class UploadGoogleSheet():
             wks_name = wks_name
         )
         print('-- Planillometro SIIF --')
+        print(self.df.head())
+
+        # Planillometro SIIF desc ICARO sin fuente
+        self.df = ejecucion_obras.reporte_planillometro(
+            full_icaro=False, es_desc_siif=False, desagregar_fuente=False
+        )
+        spreadsheet_key = '1AYeTncc1ewP8Duj13t7o6HCwAHNEWILRMNQiZHAs82I'
+        wks_name = 'planillometro_siif_sin_fte'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Planillometro SIIF sin fuente --')
         print(self.df.head())
 
 
@@ -507,6 +561,36 @@ class UploadGoogleSheet():
         print(self.df.head())
 
     # --------------------------------------------------
+    def upload_flujo_caja(self, ejercicio:str = None):
+        """Update and Upload Control Recursos
+        Update requires:
+            - SSCC Consulta General de Movimiento
+            - SSCC ctas_ctes (manual data)
+        """
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
+        flujo_caja = FlujoCaja(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio_metodo
+        )
+        # Flujo de Caja desde SSCC INVICO
+        self.df = flujo_caja.import_banco_invico()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1acuIhba9v0DqPt_NwYh73zL9rnHwlfl3h5QD3T75Oo4'
+        wks_name = 'bd_banco_invico'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Flujo de Caja desde SSCC INVICO --')
+        print(self.df.head())
+
+    # --------------------------------------------------
     def upload_control_haberes(self, ejercicio:list = None):
         """Update and Upload Control Recursos
         Update requires:
@@ -538,7 +622,7 @@ class UploadGoogleSheet():
         print(self.df.head())
 
     # --------------------------------------------------
-    def upload_control_retenciones(self):
+    def upload_control_retenciones(self, ejercicio:list = None):
         """Update and Upload Control Retenciones
         Update requires:
             - Icaro
@@ -551,21 +635,118 @@ class UploadGoogleSheet():
                 2122-1-2 Retenciones
                 1112-2-6 Banco)
         """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+
         control_retenciones = ControlRetenciones(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=self.ejercicio
+            update_db= self.update_db, ejercicio=ejercicio
         )
 
-        # Control Retenciones Icaro
-        self.df = control_retenciones.control_retenciones_mensual_cta_cte()
-        spreadsheet_key = '1hPYm25LQ13LmPXM-4skv7LhhAWL-GC4WAnm-DXKmk0I'
-        wks_name = 'icaro_retenciones'
+        # Control Cruzado Icaro VS SSCC
+        self.df = control_retenciones.icaro_vs_sscc(
+            groupby_cols=['ejercicio', 'mes', 'cta_cte']
+        )
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'icaro_vs_sscc_db'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
             wks_name = wks_name
         )
-        print('-- Control Retenciones Icaro --')
+        print('-- Control Cruzado Icaro VS SSCC --')
+        print(self.df.head())
+
+        # Control Cruzado Icaro VS SGF
+        self.df = control_retenciones.icaro_vs_invico(
+            groupby_cols=['ejercicio', 'mes', 'cta_cte', 'cuit']
+        )
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'icaro_vs_sgf_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Cruzado Icaro VS SGF --')
+        print(self.df.head())
+
+        # Control Cruzado Icaro VS SIIF
+        self.df = control_retenciones.icaro_vs_siif()
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'icaro_vs_siif_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Cruzado Icaro VS SIIF --')
+        print(self.df.head())
+
+        # Control Cruzado SGF VS SSCC
+        self.df = control_retenciones.sgf_vs_sscc()
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'sgf_vs_sscc_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Cruzado SGF VS SSCC --')
+        print(self.df.head())
+
+        # Icaro Completo
+        self.df = control_retenciones.import_icaro_carga_con_retenciones()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'icaro_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Icaro Completo --')
+        print(self.df.head())
+
+        # SGF Completo
+        self.df = control_retenciones.import_resumen_rend_cuit()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'sgf_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SGF Completo --')
+        print(self.df.head())
+
+        # SSCC Completo
+        self.df = control_retenciones.import_banco_invico()
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        wks_name = 'sscc_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SSCC Completo --')
+        print(self.df.head())
+
+        # SIIF Resumen
+        self.df = control_retenciones.siif_summarize()
+        spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
+        wks_name = 'siif_resumen_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SIIF Resumen --')
         print(self.df.head())
 
     # --------------------------------------------------
@@ -712,7 +893,8 @@ def main():
 
     # Requiere:
     # SIIF rci02, SIIF ri102, SSCC Consulta General de Movimiento
-    upload.upload_control_recursos(['2020', '2021', '2022', '2023'])
+    # upload.upload_control_recursos(['2020', '2021', '2022', '2023'])
+    # upload.upload_flujo_caja(['2022', '2023'])
 
     # Requiere
     # Icaro, rdeu012, SGF Resumen Rend por Proveedor
@@ -722,7 +904,11 @@ def main():
     # 
     # upload.upload_control_haberes(['2020', '2021', '2022', '2023'])
     
-    # upload.upload_all_dfs()
+    # Requiere
+    #     
+    # upload.upload_control_retenciones(['2022', '2023'])
+
+    upload.upload_all_dfs()
 
 # --------------------------------------------------
 if __name__ == '__main__':

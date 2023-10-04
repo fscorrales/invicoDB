@@ -61,6 +61,7 @@ class DownloadSIIF():
             else:
                 ejercicios = [ejercicio_actual]
             self.download_all = True
+            self.download_form_gto_rfp_p605b(str(int_ejercicio + 1))
             self.download_ppto_gtos_desc_rf610(ejercicios)
             self.download_ppto_gtos_fte_rf602(ejercicios)
             self.download_comprobantes_gtos_rcg01_uejp(ejercicios)
@@ -183,6 +184,21 @@ class DownloadSIIF():
         df.download_report(
             os.path.join(
                 self.output_path, 'Ejecucion Presupuestaria Recursos por Codigo (ri102)'
+            ),
+            ejercicios= ejercicios
+        )
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_form_gto_rfp_p605b(self, ejercicios:list):
+        print("- Descargando SIIF's rfp_p605b -")
+        df = form_gto_rfp_p605b.FormGtoRfpP605b(
+            siif = self.siif_connection
+        )
+        df.download_report(
+            os.path.join(
+                self.output_path, 'Formulacion Presupuestaria Gastos Desagregada (rfp_p605b)'
             ),
             ejercicios= ejercicios
         )
@@ -424,11 +440,11 @@ def main():
     DownloadSIIF(
         path_credentials_file=siif_credentials_path,
         output_path=os.path.join(output_path, 'Reportes SIIF')
-        ).download_all_siif_tables()
+        ).download_form_gto_rfp_p605b(['2023', '2024'])
 
-    invico_credentials_path = os.path.join(
-        credentials_path, 'invico_credentials.json'
-    )
+    # invico_credentials_path = os.path.join(
+    #     credentials_path, 'invico_credentials.json'
+    # )
 
     # DownloadSSCC(
     #     path_credentials_file=invico_credentials_path,

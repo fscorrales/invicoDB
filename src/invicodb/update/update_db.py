@@ -36,6 +36,7 @@ class UpdateSIIF():
         self.update_deuda_flotante_rdeu012b2_c()
         self.update_mayor_contable_rcocc31()
         self.update_ppto_rec_ri102()
+        self.update_form_gto_rfp_p605b()
         self.update_ppto_gtos_desc_rf610()
         self.update_ppto_gtos_fte_rf602()
         self.update_resumen_fdos_rfondo07tp()
@@ -95,6 +96,14 @@ class UpdateSIIF():
         df = ppto_rec_ri102.PptoRecRi102()
         df.update_sql_db(
             self.input_path + '/Ejecucion Presupuestaria Recursos por Codigo (ri102)',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_form_gto_rfp_p605b(self):
+        print("- Actualizando SIIF's rfp_p605b -")
+        df = form_gto_rfp_p605b.FormGtoRfpP605b()
+        df.update_sql_db(
+            self.input_path + '/Formulacion Presupuestaria Gastos Desagregada (rfp_p605b)',
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
@@ -357,10 +366,10 @@ def main():
     else:
         output_path = args.output_path
 
-    UpdateSIIF(
-        os.path.join(input_path, 'Reportes SIIF'), 
-        os.path.join(output_path, 'siif.sqlite')
-        ).update_all_siif_tables()
+    # UpdateSIIF(
+    #     os.path.join(input_path, 'Reportes SIIF'), 
+    #     os.path.join(output_path, 'siif.sqlite')
+    #     ).update_all_siif_tables()
     # UpdateSGF(
     #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
     #     os.path.join(output_path, 'sgf.sqlite')
@@ -369,11 +378,11 @@ def main():
     #     os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
     #     os.path.join(output_path,'sscc.sqlite')
     # ).update_all_sscc_tables()
-    # UpdateIcaro(
-    #     os.path.join(HanglingPath().get_outside_path(),
-    #     'R Output/SQLite Files/ICARO.sqlite'), 
-    #     os.path.join(output_path, 'icaro.sqlite')
-    #     ).migrate_icaro()
+    UpdateIcaro(
+        os.path.join(HanglingPath().get_outside_path(),
+        'R Output/SQLite Files/ICARO.sqlite'), 
+        os.path.join(output_path, 'icaro.sqlite')
+        ).migrate_icaro()
     # UpdateSlave(
     #     os.path.join(input_path, 'Slave/Slave.mdb'), 
     #     os.path.join(output_path, 'slave.sqlite')
