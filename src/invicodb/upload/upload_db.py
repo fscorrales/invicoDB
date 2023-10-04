@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 from invicoctrlpy.banco.flujo_caja import FlujoCaja
+from invicoctrlpy.gastos.control_escribanos.control_escribanos import \
+    ControlEscribanos
 from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
 from invicoctrlpy.gastos.control_obras.control_obras import ControlObras
 from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
@@ -92,6 +94,7 @@ class UploadGoogleSheet():
         self.upload_control_obras(ejercicios_varios)
         self.upload_control_haberes(ejercicios_varios)
         self.upload_control_retenciones([ejercicio_actual, ejercicio_anterior])
+        self.upload_control_escribanos([ejercicio_actual, ejercicio_anterior])
 
     # --------------------------------------------------
     def upload_formulacion_gtos(self, ejercicio:str = None):
@@ -809,6 +812,90 @@ class UploadGoogleSheet():
         print('-- Control Obras por Ejercicio, Mes, Cta. Cte. y CUIT --')
         print(self.df.head())
 
+
+    def upload_control_escribanos(self, ejercicio:list = None):
+        """Update and Upload Control Obras
+        Update requires:
+            - Icaro
+            - SIIF rdeu012 (para netear Icaro)
+            - SGF Resumen Rend por Proveedor
+        """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+        control_escribanos = ControlEscribanos(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio
+        )
+
+        # Control Escribanos SIIF vs SGF
+        self.df = control_escribanos.siif_vs_sgf()
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1Tz3uvUGBL8ZDSFsYRBP8hgIis-hlhs_sQ6V5bI4LaTg'
+        wks_name = 'siif_vs_sgf_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Escribanos SIIF vs SGF --')
+        print(self.df.head())
+
+        # Control Escribanos SGF vs SSCC
+        self.df = control_escribanos.sgf_vs_sscc()
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1Tz3uvUGBL8ZDSFsYRBP8hgIis-hlhs_sQ6V5bI4LaTg'
+        wks_name = 'sgf_vs_sscc_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Escribanos SGF vs SSCC --')
+        print(self.df.head())
+
+        # Control Escribanos SIIF Completo
+        self.df = control_escribanos.import_siif_escribanos()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df['fecha_aprobado'] = self.df['fecha_aprobado'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1Tz3uvUGBL8ZDSFsYRBP8hgIis-hlhs_sQ6V5bI4LaTg'
+        wks_name = 'siif_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Escribanos SIIF Completo --')
+        print(self.df.head())
+
+        # Control Escribanos SGF Completo
+        self.df = control_escribanos.import_resumen_rend_cuit()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1Tz3uvUGBL8ZDSFsYRBP8hgIis-hlhs_sQ6V5bI4LaTg'
+        wks_name = 'sgf_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Escribanos SGF Completo --')
+        print(self.df.head())
+
+        # Control Escribanos SSCC Completo
+        self.df = control_escribanos.import_banco_invico()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1Tz3uvUGBL8ZDSFsYRBP8hgIis-hlhs_sQ6V5bI4LaTg'
+        wks_name = 'sscc_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Escribanos SSCC Completo --')
+        print(self.df.head())
+
 # --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
@@ -908,7 +995,11 @@ def main():
     #     
     # upload.upload_control_retenciones(['2022', '2023'])
 
-    upload.upload_all_dfs()
+    # Requiere
+    #     
+    upload.upload_control_escribanos(['2022', '2023'])
+
+    # upload.upload_all_dfs()
 
 # --------------------------------------------------
 if __name__ == '__main__':
