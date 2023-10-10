@@ -8,10 +8,11 @@ Packages:
 
 import os
 
-from .download.download_db import (CopyIcaro, DownloadSGF, DownloadSIIF,
-                                   DownloadSSCC)
+from .download.download_db import (CopyIcaro, CopySlave, DownloadSGF,
+                                   DownloadSIIF, DownloadSSCC)
 from .hangling_path import HanglingPath
-from .update.update_db import UpdateIcaro, UpdateSGF, UpdateSIIF, UpdateSSCC
+from .update.update_db import (UpdateIcaro, UpdateSGF, UpdateSIIF, UpdateSlave,
+                               UpdateSSCC)
 from .upload.upload_db import UploadGoogleSheet
 
 
@@ -49,8 +50,15 @@ def main():
         output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
         ).download_all_sgf_tables()
 
+    exequiel_path = HanglingPath().get_slave_path()
+
+    CopySlave(
+        exequiel_path = os.path.join(exequiel_path, 'Slave.mdb'),
+        my_path = os.path.join(output_path, 'Slave/Slave.mdb')
+    )
+
     output_path = HanglingPath().get_outside_path()
-    exequiel_path = HanglingPath().get_exequiel_path()
+    exequiel_path = HanglingPath().get_r_icaro_path()
 
     CopyIcaro(
         exequiel_path= os.path.join(exequiel_path, 'ICARO.sqlite'),
@@ -76,11 +84,16 @@ def main():
         os.path.join(output_path,'sgf.sqlite')
     ).update_all_sgf_tables()
 
+    UpdateSlave(
+        os.path.join(input_path, 'Slave/Slave.mdb'), 
+        os.path.join(output_path, 'slave.sqlite')
+    ).migrate_slave()
+
     UpdateIcaro(
         os.path.join(HanglingPath().get_outside_path(),
         'R Output/SQLite Files/ICARO.sqlite'), 
         os.path.join(output_path, 'icaro.sqlite')
-        ).migrate_icaro()
+    ).migrate_icaro()
 
     # Upload module
     input_path = HanglingPath().get_update_path_input()

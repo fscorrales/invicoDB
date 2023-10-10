@@ -36,6 +36,11 @@ class HanglingPath():
         return self.db_path
 
     # --------------------------------------------------
-    def get_exequiel_path(self):
+    def get_r_icaro_path(self):
         dir_path = r'\\192.168.0.149\Compartida CONTABLE\R Apps (Compartida)\R Output\SQLite Files'
+        return dir_path
+
+    # --------------------------------------------------
+    def get_slave_path(self):
+        dir_path = r'\\192.168.0.149\Compartida CONTABLE\Slave'
         return dir_path

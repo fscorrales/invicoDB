@@ -401,6 +401,23 @@ class CopyIcaro():
             shutil.copy(self.exequiel_path, self.my_path, follow_symlinks=True)
         except Exception as e:
             print(f"No se pudo copiar ICARO por el siguiente error: {e}, {type(e)}")
+
+# --------------------------------------------------
+@dataclass
+class CopySlave():
+    """Copy Slave DB from Exequiel's PC to mine
+    :param exequiel_path
+    :param my_path
+    """
+    exequiel_path:str
+    my_path:str
+
+    def __post_init__(self):
+        print("- Copiando SLAVE desde la PC de Exequiel -")
+        try:
+            shutil.copy(self.exequiel_path, self.my_path, follow_symlinks=True)
+        except Exception as e:
+            print(f"No se pudo copiar SLAVE por el siguiente error: {e}, {type(e)}")
 # --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
@@ -437,10 +454,17 @@ def main():
         credentials_path, 'siif_credentials.json'
     )
 
-    DownloadSIIF(
-        path_credentials_file=siif_credentials_path,
-        output_path=os.path.join(output_path, 'Reportes SIIF')
-        ).download_form_gto_rfp_p605b(['2023', '2024'])
+    exequiel_path = HanglingPath().get_slave_path()
+
+    CopySlave(
+        exequiel_path = os.path.join(exequiel_path, 'Slave.mdb'),
+        my_path = os.path.join(output_path, 'Slave/Slave.mdb')
+    )
+
+    # DownloadSIIF(
+    #     path_credentials_file=siif_credentials_path,
+    #     output_path=os.path.join(output_path, 'Reportes SIIF')
+    #     ).download_form_gto_rfp_p605b(['2023', '2024'])
 
     # invico_credentials_path = os.path.join(
     #     credentials_path, 'invico_credentials.json'
@@ -456,13 +480,13 @@ def main():
     #     output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
     #     ).download_all_sgf_tables()
 
-    # output_path = HanglingPath().get_outside_path()
-    # exequiel_path = HanglingPath().get_exequiel_path()
+    output_path = HanglingPath().get_outside_path()
+    exequiel_path = HanglingPath().get_r_icaro_path()
 
-    # CopyIcaro(
-    #     exequiel_path = os.path.join(exequiel_path, 'ICARO.sqlite'),
-    #     my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
-    # )
+    CopyIcaro(
+        exequiel_path = os.path.join(exequiel_path, 'ICARO.sqlite'),
+        my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
+    )
         
 # --------------------------------------------------
 if __name__ == '__main__':

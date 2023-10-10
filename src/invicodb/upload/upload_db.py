@@ -15,6 +15,8 @@ from invicoctrlpy.banco.flujo_caja import FlujoCaja
 from invicoctrlpy.gastos.control_escribanos.control_escribanos import \
     ControlEscribanos
 from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
+from invicoctrlpy.gastos.control_honorarios.control_honorarios import \
+    ControlHonorarios
 from invicoctrlpy.gastos.control_obras.control_obras import ControlObras
 from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
@@ -95,6 +97,7 @@ class UploadGoogleSheet():
         self.upload_control_haberes(ejercicios_varios)
         self.upload_control_retenciones([ejercicio_actual, ejercicio_anterior])
         self.upload_control_escribanos([ejercicio_actual, ejercicio_anterior])
+        self.upload_control_honorarios([ejercicio_actual, ejercicio_anterior])
 
     # --------------------------------------------------
     def upload_formulacion_gtos(self, ejercicio:str = None):
@@ -381,7 +384,7 @@ class UploadGoogleSheet():
         self.df = icaro_vs_siif.control_ejecucion_anual()
         self.df = self.df.fillna(0)
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
-        wks_name = 'control_ejecucion_anual'
+        wks_name = 'control_ejecucion_anual_db'
         self.gs.to_google_sheets(
             self.df,
             spreadsheet_key = spreadsheet_key,
@@ -393,8 +396,14 @@ class UploadGoogleSheet():
         # Control Comprobantes
         self.df = icaro_vs_siif.control_comprobantes()
         self.df = self.df.fillna('')
+        self.df = self.df.astype(str)
+        campos = [
+            'siif_importe', 'icaro_importe',
+        ]
+        for campo in campos:
+            self.df[campo] = self.df[campo].astype(float)
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
-        wks_name = 'control_comprobantes'
+        wks_name = 'control_comprobantes_db'
         self.gs.to_google_sheets(
             self.df,
             spreadsheet_key = spreadsheet_key,
@@ -406,8 +415,15 @@ class UploadGoogleSheet():
         # Control PA6
         self.df = icaro_vs_siif.control_pa6()
         self.df = self.df.fillna('')
+        self.df = self.df.astype(str)
+        campos = [
+            'siif_importe_pa6', 'icaro_importe_pa6',
+            'siif_importe_reg', 'icaro_importe_reg',
+        ]
+        for campo in campos:
+            self.df[campo] = self.df[campo].astype(float)
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
-        wks_name = 'control_pa6'
+        wks_name = 'control_pa6_db'
         self.gs.to_google_sheets(
             self.df,
             spreadsheet_key = spreadsheet_key,
@@ -812,7 +828,7 @@ class UploadGoogleSheet():
         print('-- Control Obras por Ejercicio, Mes, Cta. Cte. y CUIT --')
         print(self.df.head())
 
-
+    # --------------------------------------------------
     def upload_control_escribanos(self, ejercicio:list = None):
         """Update and Upload Control Obras
         Update requires:
@@ -896,6 +912,90 @@ class UploadGoogleSheet():
         print('-- Control Escribanos SSCC Completo --')
         print(self.df.head())
 
+    # --------------------------------------------------
+    def upload_control_honorarios(self, ejercicio:list = None):
+        """Update and Upload Control Obras
+        Update requires:
+            - Icaro
+            - SIIF rdeu012 (para netear Icaro)
+            - SGF Resumen Rend por Proveedor
+        """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+        control_honorarios = ControlHonorarios(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio
+        )
+
+        # Control Honorarios SIIF vs Slave
+        self.df = control_honorarios.siif_vs_slave()
+        self.df = self.df.fillna('')
+        self.df = self.df.astype(str)
+        spreadsheet_key = '1fQhp1CdESnvqzrp3QMV5bFSHmGdi7SNoaBRWtmw-JgA'
+        wks_name = 'siif_vs_slave_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Honorarios SIIF vs Slave --')
+        print(self.df.head())
+
+        # Control Honorarios Slave vs SGF
+        self.df = control_honorarios.slave_vs_sgf(only_diff=True)
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1fQhp1CdESnvqzrp3QMV5bFSHmGdi7SNoaBRWtmw-JgA'
+        wks_name = 'slave_vs_sgf_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Honorarios Slave vs SGF --')
+        print(self.df.head())
+
+        # Control Honorarios SIIF Completo
+        self.df = control_honorarios.import_siif_comprobantes()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1fQhp1CdESnvqzrp3QMV5bFSHmGdi7SNoaBRWtmw-JgA'
+        wks_name = 'siif_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Honorarios SIIF Completo --')
+        print(self.df.head())
+
+        # Control Honorarios SGF Completo
+        self.df = control_honorarios.import_resumen_rend_honorarios()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1fQhp1CdESnvqzrp3QMV5bFSHmGdi7SNoaBRWtmw-JgA'
+        wks_name = 'sgf_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Honorarios SGF Completo --')
+        print(self.df.head())
+
+        # Control Honorarios Slave Completo
+        self.df = control_honorarios.import_slave()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1fQhp1CdESnvqzrp3QMV5bFSHmGdi7SNoaBRWtmw-JgA'
+        wks_name = 'slave_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Honorarios Slave Completo --')
+        print(self.df.head())
+
 # --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
@@ -975,7 +1075,7 @@ def main():
 
     # Adicionalmente a todo lo anterior, requiere:
     # SIIF rfondo07tp
-    # upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
+    upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
     # upload.upload_comprobantes_gastos()
 
     # Requiere:
@@ -997,7 +1097,11 @@ def main():
 
     # Requiere
     #     
-    upload.upload_control_escribanos(['2022', '2023'])
+    # upload.upload_control_escribanos(['2022', '2023'])
+
+    # Requiere
+    #     
+    # upload.upload_control_honorarios(['2022', '2023'])
 
     # upload.upload_all_dfs()
 
