@@ -8,10 +8,13 @@ Packages:
 import argparse
 import datetime as dt
 import os
+import time
 from dataclasses import dataclass, field
 
 import pandas as pd
 from invicoctrlpy.banco.flujo_caja import FlujoCaja
+from invicoctrlpy.gastos.control_debitos_bancarios.control_debitos_bancarios import \
+    ControlDebitosBancarios
 from invicoctrlpy.gastos.control_escribanos.control_escribanos import \
     ControlEscribanos
 from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
@@ -26,6 +29,8 @@ from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
 from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import \
     FondosPermCajasChicas
 from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
+from invicoctrlpy.recursos.aporte_empresario.aporte_empresario import \
+    ControlAporteEmpresario
 from invicoctrlpy.recursos.control_recursos.control_recursos import \
     ControlRecursos
 from invicodatpy.utils.google_sheets import GoogleSheets
@@ -92,12 +97,15 @@ class UploadGoogleSheet():
         self.upload_control_icaro(ejercicios_varios)
         # self.upload_comprobantes_gastos()
         self.upload_control_recursos(ejercicios_varios)
+        time.sleep(120)
         self.upload_flujo_caja(ejercicios_varios)
         self.upload_control_obras(ejercicios_varios)
-        self.upload_control_haberes(ejercicios_varios)
+        self.upload_control_haberes([ejercicio_actual, ejercicio_anterior])
         self.upload_control_retenciones([ejercicio_actual, ejercicio_anterior])
         self.upload_control_escribanos([ejercicio_actual, ejercicio_anterior])
         self.upload_control_honorarios([ejercicio_actual, ejercicio_anterior])
+        self.upload_control_debitos_bancarios([ejercicio_actual, ejercicio_anterior])
+        self.upload_control_3_porciento_invico([ejercicio_actual, ejercicio_anterior])
 
     # --------------------------------------------------
     def upload_formulacion_gtos(self, ejercicio:str = None):
@@ -640,6 +648,51 @@ class UploadGoogleSheet():
         print('-- Control Haberes mensual --')
         print(self.df.head())
 
+        # Comprobantes SIIF de Haberes (rcg01_uejp + gto_rpa03g)
+        self.df = control_haberes.siif_comprobantes_haberes_neto_rdeu
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1A9ypUkwm4kfLqUAwr6-55crcFElisOO9fOdI6iflMAc'
+        wks_name = 'siif_comprobantes_haberes_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Comprobantes SIIF de Haberes (rcg01_uejp + gto_rpa03g) --')
+        print(self.df.head())
+
+        # Deuda Flotante SIIF (rdeu012)
+        self.df = control_haberes.siif_rdeu012
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        self.df['fecha_aprobado'] = self.df['fecha_aprobado'].dt.strftime('%d-%m-%Y')
+        self.df['fecha_desde'] = self.df['fecha_desde'].dt.strftime('%d-%m-%Y')
+        self.df['fecha_hasta'] = self.df['fecha_hasta'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1A9ypUkwm4kfLqUAwr6-55crcFElisOO9fOdI6iflMAc'
+        wks_name = 'siif_rdeu_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Deuda Flotante SIIF (rdeu012) --')
+        print(self.df.head())
+
+        # Resumen General de Movimentos (Sist. Seg. Ctas. Ctes. INVICO)
+        self.df = control_haberes.sscc_banco_invico
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1A9ypUkwm4kfLqUAwr6-55crcFElisOO9fOdI6iflMAc'
+        wks_name = 'sscc_haberes_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Resumen General de Movimentos (Sist. Seg. Ctas. Ctes. INVICO) --')
+        print(self.df.head())
+
     # --------------------------------------------------
     def upload_control_retenciones(self, ejercicio:list = None):
         """Update and Upload Control Retenciones
@@ -677,7 +730,7 @@ class UploadGoogleSheet():
         print(self.df.head())
 
         # Control Cruzado Icaro VS SGF
-        self.df = control_retenciones.icaro_vs_invico(
+        self.df = control_retenciones.icaro_vs_sgf(
             groupby_cols=['ejercicio', 'mes', 'cta_cte', 'cuit']
         )
         spreadsheet_key = '1FQt_TLY5dqZTon-2o71BNHK4uJJ9i9rQVar1E0Te6zM'
@@ -996,6 +1049,123 @@ class UploadGoogleSheet():
         print('-- Control Honorarios Slave Completo --')
         print(self.df.head())
 
+    # --------------------------------------------------
+    def upload_control_debitos_bancarios(self, ejercicio:list = None):
+        """Update and Upload Control Debitos Bancarios
+        Update requires:
+            - SIIF gto_rpa03g
+            - SIIF rcg01_uejp
+            - SSCC
+        """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+        control_debitos = ControlDebitosBancarios(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio
+        )
+
+        # Control Debitos Bancarios SIIF vs SSCC
+        self.df = control_debitos.siif_vs_sscc()
+        self.df = self.df.fillna('')
+        # self.df = self.df.astype(str)
+        spreadsheet_key = '1i9vQ-fw_MkuHRE_YKa_diaVDu5RsiBE1UPTNAsmxLS4'
+        wks_name = 'siif_vs_sscc_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Debitos Bancarios SIIF vs SSCC --')
+        print(self.df.head())
+
+        # Control Debitos Bancarios SIIF Completo
+        self.df = control_debitos.import_siif_debitos()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1i9vQ-fw_MkuHRE_YKa_diaVDu5RsiBE1UPTNAsmxLS4'
+        wks_name = 'siif_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Debitos Bancarios SIIF Completo --')
+        print(self.df.head())
+
+        # Control Debitos Bancarios SSCC Completo
+        self.df = control_debitos.import_banco_invico()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1i9vQ-fw_MkuHRE_YKa_diaVDu5RsiBE1UPTNAsmxLS4'
+        wks_name = 'sscc_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Debitos Bancarios SSCC Completo --')
+        print(self.df.head())
+
+    # --------------------------------------------------
+    def upload_control_3_porciento_invico(self, ejercicio:list = None):
+        """Update and Upload Control INVICO 3%
+        Update requires:
+            - SIIF rci02
+            - SIIF rcocc31 (
+                1112-2-6 Banco INVICO
+                2122-1-2 Retenciones
+            )
+        """
+        if ejercicio == None:
+            ejercicio = self.ejercicio
+        aporte_empresario = ControlAporteEmpresario(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio
+        )
+
+        # Control INVICO 3% Recursos vs Retenciones
+        self.df = aporte_empresario.siif_recurso_vs_retencion_337()
+        self.df = self.df.fillna('')
+        # self.df = self.df.astype(str)
+        spreadsheet_key = '1bZnvl9YkHC-N1HbIbnFNrqU3Iq03PG81u7fdHe_v_pw'
+        wks_name = 'siif_recurso_vs_retencion_337_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control INVICO 3% Recursos vs Retenciones --')
+        print(self.df.head())
+
+        # Control Recursos INVICO 3% COMPLETO
+        self.df = aporte_empresario.import_siif_recurso_3_percent()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1bZnvl9YkHC-N1HbIbnFNrqU3Iq03PG81u7fdHe_v_pw'
+        wks_name = 'siif_recurso_3_percent_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control Recursos INVICO 3% COMPLETO --')
+        print(self.df.head())
+
+        # Control SIIF Retención 337 COMPLETO
+        self.df = aporte_empresario.import_siif_retencion_337()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1bZnvl9YkHC-N1HbIbnFNrqU3Iq03PG81u7fdHe_v_pw'
+        wks_name = 'siif_retencion_337_db'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Control SIIF Retención 337 COMPLETO --')
+        print(self.df.head())
+
+
 # --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
@@ -1075,7 +1245,7 @@ def main():
 
     # Adicionalmente a todo lo anterior, requiere:
     # SIIF rfondo07tp
-    upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
+    # upload.upload_control_icaro(['2019','2020', '2021', '2022', '2023'])    
     # upload.upload_comprobantes_gastos()
 
     # Requiere:
@@ -1085,11 +1255,11 @@ def main():
 
     # Requiere
     # Icaro, rdeu012, SGF Resumen Rend por Proveedor
-    # upload.upload_control_obras(['2020', '2021', '2022', '2023'])
+    upload.upload_control_obras(['2020', '2021', '2022', '2023'])
 
     # Requiere
     # 
-    # upload.upload_control_haberes(['2020', '2021', '2022', '2023'])
+    # upload.upload_control_haberes(['2022', '2023'])
     
     # Requiere
     #     
@@ -1102,6 +1272,14 @@ def main():
     # Requiere
     #     
     # upload.upload_control_honorarios(['2022', '2023'])
+
+    # Requiere
+    #     
+    # upload.upload_control_debitos_bancarios(['2022', '2023'])
+
+    # Requiere
+    #     
+    # upload.upload_control_3_porciento_invico(['2022', '2023'])
 
     # upload.upload_all_dfs()
 
