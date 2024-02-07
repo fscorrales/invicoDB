@@ -259,72 +259,88 @@ class UpdateSGV():
         self.update_resumen_recaudado()
         self.update_saldo_barrio_variacion()
         self.update_saldo_barrio()
+        self.update_saldo_motivo_por_barrio()
         self.update_saldo_motivo()
-        self.update_saldo_motivo_entrega_viviendas()
-        self.update_saldo_motivo_actualizacion_semestral()
         self.update_saldo_recuperos_cobrar_variacion()
 
     # --------------------------------------------------
     def update_barrios_nuevos(self):
         df = barrios_nuevos.BarriosNuevos()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Barrios Nuevos'
+        )
         df.update_sql_db(
-            self.input_path + '/Barrios Nuevos',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
     def update_resumen_facturado(self):
         df = resumen_facturado.ResumenFacturado()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Resumen Facturado'
+        )
         df.update_sql_db(
-            self.input_path + '/Resumen Facturado',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
     def update_resumen_recaudado(self):
         df = resumen_recaudado.ResumenRecaudado()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Resumen Recaudado'
+        )
         df.update_sql_db(
-            self.input_path + '/Resumen Recaudado',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
     def update_saldo_barrio_variacion(self):
         df = saldo_barrio_variacion.SaldoBarrioVariacion()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Variacion Saldo Por Barrio'
+        )
         df.update_sql_db(
-            self.input_path + '/Evolucion de Saldo Por Barrio',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
 
     # --------------------------------------------------
     def update_saldo_barrio(self):
         df = saldo_barrio.SaldoBarrio()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Saldo Por Barrio'
+        )
         df.update_sql_db(
-            self.input_path + '/Saldo por Barrio',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_saldo_motivo_por_barrio(self):
+        df = saldo_motivo_por_barrio.SaldoMotivoPorBarrio()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Saldo Por Motivo Por Barrio'
+        )
+        df.update_sql_db(
+            full_input_path,
+            output_path=self.output_path, clean_first=False)
 
     # --------------------------------------------------
     def update_saldo_motivo(self):
         df = saldo_motivo.SaldoMotivo()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Saldo Por Motivo'
+        )
         df.update_sql_db(
-            self.input_path + '/Evolucion de Saldo Por Motivo',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
-
-    # --------------------------------------------------
-    def update_saldo_motivo_entrega_viviendas(self):
-        df = saldo_motivo_entrega_viviendas.SaldoMotivoEntregaViviendas()
-        df.update_sql_db(
-            self.input_path + '/Motivo Entrega de Viviendas',
-            output_path=self.output_path, clean_first=False)
-
-    # --------------------------------------------------
-    def update_saldo_motivo_actualizacion_semestral(self):
-        df = saldo_motivo_actualizacion_semestral.SaldoMotivoActualizacionSemestral()
-        df.update_sql_db(
-            self.input_path + '/Motivo Actualizacion Semestral',
-            output_path=self.output_path, clean_first=False)
 
     # --------------------------------------------------
     def update_saldo_recuperos_cobrar_variacion(self):
         df = saldo_recuperos_cobrar_variacion.SaldoRecuperosCobrarVariacion()
+        full_input_path = os.path.join(
+            self.input_path, 'Sistema Recuperos GV', 'Variacion Saldo Recuperos Cobrar'
+        )
         df.update_sql_db(
-            self.input_path + '/Variación de Saldos Recuperos A Cobrar',
+            full_input_path,
             output_path=self.output_path, clean_first=True)
 
 # --------------------------------------------------
@@ -374,23 +390,23 @@ def main():
     #     os.path.join(input_path, 'Sistema Gestion Financiera'), 
     #     os.path.join(output_path, 'sgf.sqlite')
     #     ).update_all_sgf_tables()
-    UpdateSSCC(
-        os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
-        os.path.join(output_path,'sscc.sqlite')
-    ).update_all_sscc_tables()
-    UpdateIcaro(
-        os.path.join(HanglingPath().get_outside_path(),
-        'R Output/SQLite Files/ICARO.sqlite'), 
-        os.path.join(output_path, 'icaro.sqlite')
-        ).migrate_icaro()
+    # UpdateSSCC(
+    #     os.path.join(input_path, 'Sistema de Seguimiento de Cuentas Corrientes'), 
+    #     os.path.join(output_path,'sscc.sqlite')
+    # ).update_all_sscc_tables()
+    # UpdateIcaro(
+    #     os.path.join(HanglingPath().get_outside_path(),
+    #     'R Output/SQLite Files/ICARO.sqlite'), 
+    #     os.path.join(output_path, 'icaro.sqlite')
+    #     ).migrate_icaro()
     # UpdateSlave(
     #     os.path.join(input_path, 'Slave/Slave.mdb'), 
     #     os.path.join(output_path, 'slave.sqlite')
     #     ).migrate_slave()
-    # UpdateSGV(
-    #     os.path.join(input_path, 'Gestión Vivienda GV/Sistema Recuperos GV'), 
-    #     os.path.join(output_path, 'sgv.sqlite')
-    #     ).update_all_sgv_tables()
+    UpdateSGV(
+        os.path.join(input_path, 'Gestión Vivienda GV'), 
+        os.path.join(output_path, 'sgv.sqlite')
+        ).update_all_sgv_tables()
         
 # --------------------------------------------------
 if __name__ == '__main__':

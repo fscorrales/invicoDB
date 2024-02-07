@@ -1255,7 +1255,7 @@ def main():
 
     # Requiere
     # Icaro, rdeu012, SGF Resumen Rend por Proveedor
-    upload.upload_control_obras(['2020', '2021', '2022', '2023'])
+    # upload.upload_control_obras(['2020', '2021', '2022', '2023'])
 
     # Requiere
     # 
@@ -1281,7 +1281,7 @@ def main():
     #     
     # upload.upload_control_3_porciento_invico(['2022', '2023'])
 
-    # upload.upload_all_dfs()
+    upload.upload_all_dfs()
 
 # --------------------------------------------------
 if __name__ == '__main__':

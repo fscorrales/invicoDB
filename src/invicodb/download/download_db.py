@@ -10,9 +10,11 @@ import datetime as dt
 import json
 import os
 import shutil
+import time
 from dataclasses import dataclass, field
 
 from invicodatpy.sgf import *
+from invicodatpy.sgv import *
 from invicodatpy.siif import *
 from invicodatpy.sscc import *
 from selenium import webdriver
@@ -57,11 +59,12 @@ class DownloadSIIF():
             fecha_limite = dt.datetime(year=int_ejercicio, month=3, day=31)
             if dt.datetime.now() < fecha_limite:
                 ejercicio_anterior = str(dt.datetime.now().year - 1)
-                ejercicios = [ejercicio_anterior, ejercicio_actual]
+                # ejercicios = [ejercicio_anterior, ejercicio_actual]
+                ejercicios = [ejercicio_anterior]
             else:
                 ejercicios = [ejercicio_actual]
             self.download_all = True
-            self.download_form_gto_rfp_p605b(str(int_ejercicio + 1))
+            # self.download_form_gto_rfp_p605b(str(int_ejercicio + 1))
             self.download_ppto_gtos_desc_rf610(ejercicios)
             self.download_ppto_gtos_fte_rf602(ejercicios)
             self.download_comprobantes_gtos_rcg01_uejp(ejercicios)
@@ -80,7 +83,9 @@ class DownloadSIIF():
             mes_anterior = int(mes_actual[-2:]) - 1
             if mes_anterior == 0:
                 mes_anterior = 12
-            mes_anterior = mes_actual[:-2] + str(mes_anterior).zfill(2) 
+                mes_anterior = str(int(mes_actual[:4]) - 1) + '-' + str(mes_anterior).zfill(2)
+            else:    
+                mes_anterior = mes_actual[:-2] + str(mes_anterior).zfill(2) 
             meses = [mes_anterior, mes_actual]
             self.download_deuda_flotante_rdeu012(meses)
             # self.download_deuda_flotante_rdeu012b2_c()
@@ -357,7 +362,8 @@ class DownloadSGF():
             fecha_limite = dt.datetime(year=int_ejercicio, month=1, day=31)
             if dt.datetime.now() < fecha_limite:
                 ejercicio_anterior = str(dt.datetime.now().year - 1)
-                ejercicios = [ejercicio_anterior, ejercicio_actual]
+                # ejercicios = [ejercicio_anterior, ejercicio_actual]
+                ejercicios = [ejercicio_anterior]
             else:
                 ejercicios = [ejercicio_actual]
             self.download_all = True
@@ -384,6 +390,155 @@ class DownloadSGF():
     # --------------------------------------------------
     def quit(self):
         self.sgf_connection.quit()
+
+# --------------------------------------------------
+@dataclass
+class DownloadSGV():
+    """Download SIIF' reports
+    :param path_credentials_file: json file with SGV' credentials
+    :param input_path: If update_db is True '/Base de Datos' path must be given
+    :param output_path: If update_db is True 'Python Output/SQLite Files' must be given
+    """
+    path_credentials_file:str
+    output_path:str
+    download_all:bool = field(init=False, repr=False, default=False)
+    sgv_connection:webdriver = field(init=False, repr=False)
+
+    # --------------------------------------------------
+    def __post_init__(self):
+        print('--- Iniciando descarga de DB SGV ---')
+        print('- Connect to SGV -')
+        if os.path.isfile(self.path_credentials_file):
+            with open(self.path_credentials_file) as json_file:
+                data_json = json.load(json_file)
+                self.sgv_connection =connect_sgv.ConnectSGV(
+                    data_json['username'], data_json['password']
+                )
+            json_file.close()
+        else:
+            print('El ruta del archivo json con las credenciales de acceso no es válida')
+            print(self.path_credentials_file)
+
+    # --------------------------------------------------
+    def download_all_sgv_tables(self, ejercicios:list = None):
+        try:
+            print("- Iniciando descarga masiva de reportes SGV -")
+            if ejercicios is None:
+                int_ejercicio = dt.datetime.now().year
+                ejercicios = list(range(int_ejercicio - 10, int_ejercicio))
+                ejercicios = list(map(str, ejercicios))
+            self.download_all = True
+            self.download_barrios_nuevos(ejercicios)
+            self.download_resumen_facturado(ejercicios)
+            self.download_resumen_recaudado(ejercicios)
+            self.download_saldo_barrio_variacion(ejercicios)
+            self.download_saldo_barrio(ejercicios)
+            self.download_saldo_motivo_por_barrio(ejercicios)
+            self.download_saldo_motivo(ejercicios)
+            self.download_saldo_recuperos_cobrar_variacion(ejercicios)
+        except Exception as e:
+            print(f"Ocurrió un error: {e}, {type(e)}")
+            self.sgv_connection.disconnect() 
+        finally:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_barrios_nuevos(self, ejercicios:list):
+        print("- Descargando SGV Barrios Nuevos -")
+        df = barrios_nuevos.BarriosNuevos(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Barrios Nuevos'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_resumen_facturado(self, ejercicios:list):
+        print("- Descargando SGV Resumen Facturado -")
+        df = resumen_facturado.ResumenFacturado(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Resumen Facturado'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_resumen_recaudado(self, ejercicios:list):
+        print("- Descargando SGV Resumen Recaudado -")
+        df = resumen_recaudado.ResumenRecaudado(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Resumen Recaudado'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_saldo_barrio_variacion(self, ejercicios:list):
+        print("- Descargando SGV Variacion Saldo por Barrio -")
+        df = saldo_barrio_variacion.SaldoBarrioVariacion(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Variacion Saldo Por Barrio'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_saldo_barrio(self, ejercicios:list):
+        print("- Descargando SGV Saldo por Barrio -")
+        df = saldo_barrio.SaldoBarrio(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Saldo Por Barrio'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    def download_saldo_motivo_por_barrio(self, ejercicios:list):
+        print("- Descargando SGV Saldo por Motivo por Barrio -")
+        df = saldo_motivo_por_barrio.SaldoMotivoPorBarrio(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Saldo Por Motivo Por Barrio'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    def download_saldo_motivo(self, ejercicios:list):
+        print("- Descargando SGV Saldo por Motivo -")
+        df = saldo_motivo.SaldoMotivo(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Saldo Por Motivo'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    def download_saldo_recuperos_cobrar_variacion(self, ejercicios:list):
+        print("- Descargando SGV Variacion Saldo Recuperos Cobrar -")
+        df = saldo_recuperos_cobrar_variacion.SaldoRecuperosCobrarVariacion(sgv = self.sgv_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Sistema Recuperos GV', 'Variacion Saldo Recuperos Cobrar'
+        )
+        df.download_report(full_output_path, ejercicios = ejercicios)
+        self.sgv_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def quit(self):
+        # self.remove_html_files()
+        self.sgv_connection.disconnect()
 
 # --------------------------------------------------
 @dataclass
@@ -456,19 +611,19 @@ def main():
 
     exequiel_path = HanglingPath().get_slave_path()
 
-    CopySlave(
-        exequiel_path = os.path.join(exequiel_path, 'Slave.mdb'),
-        my_path = os.path.join(output_path, 'Slave/Slave.mdb')
-    )
+    # CopySlave(
+    #     exequiel_path = os.path.join(exequiel_path, 'Slave.mdb'),
+    #     my_path = os.path.join(output_path, 'Slave/Slave.mdb')
+    # )
 
     # DownloadSIIF(
     #     path_credentials_file=siif_credentials_path,
     #     output_path=os.path.join(output_path, 'Reportes SIIF')
     #     ).download_form_gto_rfp_p605b(['2023', '2024'])
 
-    # invico_credentials_path = os.path.join(
-    #     credentials_path, 'invico_credentials.json'
-    # )
+    invico_credentials_path = os.path.join(
+        credentials_path, 'invico_credentials.json'
+    )
 
     # DownloadSSCC(
     #     path_credentials_file=invico_credentials_path,
@@ -480,13 +635,22 @@ def main():
     #     output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
     #     ).download_all_sgf_tables()
 
-    output_path = HanglingPath().get_outside_path()
-    exequiel_path = HanglingPath().get_r_icaro_path()
+    # output_path = HanglingPath().get_outside_path()
+    # exequiel_path = HanglingPath().get_r_icaro_path()
 
-    CopyIcaro(
-        exequiel_path = os.path.join(exequiel_path, 'ICARO.sqlite'),
-        my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
+    # CopyIcaro(
+    #     exequiel_path = os.path.join(exequiel_path, 'ICARO.sqlite'),
+    #     my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
+    # )
+
+    sgv_credentials_path = os.path.join(
+        credentials_path, 'sgv_credentials.json'
     )
+
+    DownloadSGV(
+        path_credentials_file=sgv_credentials_path,
+        output_path=os.path.join(output_path, 'Gestión Vivienda GV')
+        ).download_all_sgv_tables()  
         
 # --------------------------------------------------
 if __name__ == '__main__':
