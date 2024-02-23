@@ -630,10 +630,10 @@ def main():
     #     output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
     #     ).download_all_sscc_tables()
 
-    # DownloadSGF(
-    #     path_credentials_file=invico_credentials_path,
-    #     output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
-    #     ).download_all_sgf_tables()
+    DownloadSGF(
+        path_credentials_file=invico_credentials_path,
+        output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
+        ).download_all_sgf_tables()
 
     # output_path = HanglingPath().get_outside_path()
     # exequiel_path = HanglingPath().get_r_icaro_path()
@@ -643,14 +643,14 @@ def main():
     #     my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
     # )
 
-    sgv_credentials_path = os.path.join(
-        credentials_path, 'sgv_credentials.json'
-    )
+    # sgv_credentials_path = os.path.join(
+    #     credentials_path, 'sgv_credentials.json'
+    # )
 
-    DownloadSGV(
-        path_credentials_file=sgv_credentials_path,
-        output_path=os.path.join(output_path, 'Gestión Vivienda GV')
-        ).download_all_sgv_tables()  
+    # DownloadSGV(
+    #     path_credentials_file=sgv_credentials_path,
+    #     output_path=os.path.join(output_path, 'Gestión Vivienda GV')
+    #     ).download_all_sgv_tables()  
         
 # --------------------------------------------------
 if __name__ == '__main__':
