@@ -5,7 +5,6 @@ import datetime as dt
 
 from .default_widgets_setup import *
 
-
 @dataclass
 class MainWindowUI():
     master:ctk.CTk
@@ -38,11 +37,15 @@ class MainWindowUI():
         for index in [1, 2, 3, 4]:
             self.frame_process.columnconfigure(index=index, weight=1)
 
-        optional_menu_list = ["Readonly combobox", "Item 1", "Item 2"]
-        var_option_process_type = ctk.StringVar(value="Item 1")
+        optional_menu_list = [
+            'Personalizado',
+            'Completo',
+            'Completo Sin Recuperos'
+        ]
+        var_option_process_type = ctk.StringVar(value="Personalizado")
         self.optional_process_type = DefaultOptionMenu(
             self.frame_process, values = optional_menu_list,
-            command = self.optionmenu_callback,
+            command = self.processTypeCallback,
             variable = var_option_process_type
         )
         self.optional_process_type.configure(width=300)
@@ -78,8 +81,11 @@ class MainWindowUI():
             padx=self.padx_checkbox, pady=self.pady_checkbox
         )
 
-    def optionmenu_callback(self, choice):
-        print("optionmenu dropdown clicked:", choice)
+    def processTypeCallback(self, choice):
+        if choice == "Completo":
+            self.frame_siif.var_switch_all.set(1)
+            self.frame_siif.switch_all()
+        # print("optionmenu dropdown clicked:", choice)
 
     def setupSIIFFrame(
             self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1

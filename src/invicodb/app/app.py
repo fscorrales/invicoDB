@@ -12,6 +12,7 @@ import customtkinter as ctk
 
 from ..hangling_path import HanglingPath
 from .main_window_ui import MainWindowUI
+from .main_window_fct import MainWindowFct
 
 class App(ctk.CTk):
     def __init__(self):
@@ -19,6 +20,8 @@ class App(ctk.CTk):
         main_window = MainWindowUI(
             self, padx_frame=10, pady_frame=10
         )
+        MainWindowFct(main_window)
+
         # self.readonly_combo_list = ["Readonly combobox", "Item 1", "Item 2"]
         # self.readonly_combo = ctk.CTkOptionMenu(
         #     self, values=self.readonly_combo_list
