@@ -16,3 +16,9 @@ class MainWindowFct():
 
     def pressProcess(self):
         print("Process")
+
+    # def processTypeCallback(self, choice):
+    #     if choice == "Completo":
+    #         self.frame_siif.var_switch_all.set(1)
+    #         self.frame_siif.switch_all()
+        # print("optionmenu dropdown clicked:", choice)

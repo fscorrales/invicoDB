@@ -40,7 +40,8 @@ class MainWindowUI():
         optional_menu_list = [
             'Personalizado',
             'Completo',
-            'Completo Sin Recuperos'
+            'Completo Sin Recuperos',
+            'Control Icaro'
         ]
         var_option_process_type = ctk.StringVar(value="Personalizado")
         self.optional_process_type = DefaultOptionMenu(
@@ -82,10 +83,50 @@ class MainWindowUI():
         )
 
     def processTypeCallback(self, choice):
-        if choice == "Completo":
+        if choice == "Personalizado":
+            self.unselectAllCheakBoxes()
+        elif choice == "Control Icaro":
+            self.unselectAllCheakBoxes()
+            self.frame_sist_propios.var_icaro.set(1)
+            self.frame_siif.var_rf602.set(1)
+            self.frame_siif.var_gto_rpa03g.set(1)
+            self.frame_siif.var_rcg01_uejp.set(1)
+            self.frame_siif.var_rfondo07tp.set(1)
+            self.frame_sscc.var_ctas_ctes.set(1)
+        elif choice == "Completo":
+            self.unselectAllCheakBoxes()
             self.frame_siif.var_switch_all.set(1)
             self.frame_siif.switch_all()
-        # print("optionmenu dropdown clicked:", choice)
+            self.frame_sgf.var_switch_all.set(1)
+            self.frame_sgf.switch_all()
+            self.frame_sscc.var_switch_all.set(1)
+            self.frame_sscc.switch_all()
+            self.frame_recuperos.var_switch_all.set(1)
+            self.frame_recuperos.switch_all()
+            self.frame_sist_propios.var_switch_all.set(1)
+            self.frame_sist_propios.switch_all()
+        elif choice == "Completo Sin Recuperos":
+            self.unselectAllCheakBoxes()
+            self.frame_siif.var_switch_all.set(1)
+            self.frame_siif.switch_all()
+            self.frame_sgf.var_switch_all.set(1)
+            self.frame_sgf.switch_all()
+            self.frame_sscc.var_switch_all.set(1)
+            self.frame_sscc.switch_all()
+            self.frame_sist_propios.var_switch_all.set(1)
+            self.frame_sist_propios.switch_all()
+
+    def unselectAllCheakBoxes(self):
+        self.frame_siif.var_switch_all.set(0)
+        self.frame_siif.switch_all()
+        self.frame_sgf.var_switch_all.set(0)
+        self.frame_sgf.switch_all()
+        self.frame_sscc.var_switch_all.set(0)
+        self.frame_sscc.switch_all()
+        self.frame_recuperos.var_switch_all.set(0)
+        self.frame_recuperos.switch_all()
+        self.frame_sist_propios.var_switch_all.set(0)
+        self.frame_sist_propios.switch_all()
 
     def setupSIIFFrame(
             self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
@@ -95,7 +136,7 @@ class MainWindowUI():
             'Presupuesto Gastos con Descripción (rf610)':'var_rf610',
             'Presupuesto Gastos con Fuentes (rf602)':'var_rf602',
             'Comprobantes Gastos (rcg01_uejp)':'var_rcg01_uejp',
-            'Comprobantes Gastos x Partida (rpa03g)':'var_rpa03g',
+            'Comprobantes Gastos x Partida (rpa03g)':'var_gto_rpa03g',
             'Deuda Flotante (rdeu012)':'var_rdeu012',
             'Resumen de Fondos (rfondo07tp)':'var_rfondo07tp',
             'Presupuesto Recursos (ri102)':'var_ri102',
