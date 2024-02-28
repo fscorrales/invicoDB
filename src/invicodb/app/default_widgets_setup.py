@@ -83,7 +83,7 @@ class MyScrollableCheckboxFrame(DefaultScrollableFrame):
         self.var_switch_all = ctk.BooleanVar()
         self.switch = DefaultSwitch(
             self, text="Seleccionar Todo", variable=self.var_switch_all,
-            command=self.switch_all
+            command=self.switchAll
         )
         self.switch.grid(
             row=0, column=1, padx=10, pady=(0, 0), sticky="nsew"
@@ -99,21 +99,21 @@ class MyScrollableCheckboxFrame(DefaultScrollableFrame):
             )
             self.checkboxes.append(checkbox)
 
-    def get_text(self):
+    def getText(self):
         checked_checkboxes = []
         for checkbox in self.checkboxes:
             if checkbox.get() == 1:
                 checked_checkboxes.append(checkbox.cget("text"))
         return checked_checkboxes
     
-    def get_variable(self):
+    def getTextVariable(self):
         checked_checkboxes = []
         for checkbox in self.checkboxes:
             if checkbox.get() == 1:
-                checked_checkboxes.append(checkbox.cget("variable"))
+                checked_checkboxes.append(checkbox.cget("textvariable"))
         return checked_checkboxes
     
-    def switch_all(self):
+    def switchAll(self):
         if self.var_switch_all.get() == 1:
             for checkbox in self.checkboxes:
                 checkbox.select()

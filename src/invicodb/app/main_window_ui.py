@@ -59,7 +59,7 @@ class MainWindowUI():
         )
 
         current_year = dt.datetime.now().year
-        year_list = list(map(str, range(2010, current_year + 1)))
+        year_list = list(map(str, range(current_year, 2009, -1)))
 
         self.label_desde = ctk.CTkLabel(self.frame_process, text="Desde:")
         self.label_desde.grid(
