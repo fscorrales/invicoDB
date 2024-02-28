@@ -140,6 +140,26 @@ class MainWindowFct():
             #     siif.download_rcg01_uejp()
             # if self.mw.frame_siif.var_rfondo07tp.get() == 1:
             #     siif.download_rfondo07tp()
+
+
+            # self.download_mayor_contable_rcocc31(
+            #     ejercicios, 
+            #     ctas_contables = [
+            #         '1112-2-6', '1141-1-4', '2111-1-1', '2111-1-2',
+            #         '2113-2-9', '2121-1-1', '2122-1-2',
+            #     ]
+            # )
+            # mes_actual = dt.datetime.strftime(dt.datetime.now(), '%Y-%m')
+            # mes_anterior = int(mes_actual[-2:]) - 1
+            # if mes_anterior == 0:
+            #     mes_anterior = 12
+            #     mes_anterior = str(int(mes_actual[:4]) - 1) + '-' + str(mes_anterior).zfill(2)
+            # else:    
+            #     mes_anterior = mes_actual[:-2] + str(mes_anterior).zfill(2) 
+            # meses = [mes_anterior, mes_actual]
+            # self.download_deuda_flotante_rdeu012(meses)
+
+            
             # siif.quit() #Revisar el remove HTML
         
         # Verificamos si existen reportes SGF para descargar
