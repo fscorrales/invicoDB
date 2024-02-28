@@ -49,8 +49,7 @@ class MainWindowUI():
         var_option_process_type = ctk.StringVar(value="Personalizado")
         self.optional_process_type = DefaultOptionMenu(
             self.frame_process, values = optional_menu_list,
-            command = self.processTypeCallback,
-            variable = var_option_process_type
+            variable = var_option_process_type,
         )
         self.optional_process_type.configure(width=300)
         # self.optional_menu.set("Readonly combobox")
@@ -84,55 +83,6 @@ class MainWindowUI():
             row=0, column=4, sticky="nsew", 
             padx=self.padx_checkbox, pady=self.pady_checkbox
         )
-
-    def processTypeCallback(self, choice):
-        if choice == "Personalizado":
-            self.unselectAllCheakBoxes()
-        elif choice == "Control Icaro":
-            self.unselectAllCheakBoxes()
-            self.frame_sist_propios.var_icaro.set(1)
-            self.frame_siif.var_rf602.set(1)
-            self.frame_siif.var_gto_rpa03g.set(1)
-            self.frame_siif.var_rcg01_uejp.set(1)
-            self.frame_siif.var_rfondo07tp.set(1)
-            self.frame_sscc.var_ctas_ctes.set(1)
-            self.frame_gastos.var_ctrl_icaro.set(1)
-        elif choice == "Completo":
-            self.unselectAllCheakBoxes()
-            self.frame_siif.var_switch_all.set(1)
-            self.frame_siif.switch_all()
-            self.frame_sgf.var_switch_all.set(1)
-            self.frame_sgf.switch_all()
-            self.frame_sscc.var_switch_all.set(1)
-            self.frame_sscc.switch_all()
-            self.frame_recuperos.var_switch_all.set(1)
-            self.frame_recuperos.switch_all()
-            self.frame_sist_propios.var_switch_all.set(1)
-            self.frame_sist_propios.switch_all()
-            self.frame_recursos.var_switch_all.set(1)
-            self.frame_recursos.switch_all()
-            self.frame_gastos.var_switch_all.set(1)
-            self.frame_gastos.switch_all()
-        elif choice == "Completo Sin Recuperos":
-            self.processTypeCallback("Completo")
-            self.frame_recuperos.var_switch_all.set(0)
-            self.frame_recuperos.switch_all()
-
-    def unselectAllCheakBoxes(self):
-        self.frame_siif.var_switch_all.set(0)
-        self.frame_siif.switch_all()
-        self.frame_sgf.var_switch_all.set(0)
-        self.frame_sgf.switch_all()
-        self.frame_sscc.var_switch_all.set(0)
-        self.frame_sscc.switch_all()
-        self.frame_recuperos.var_switch_all.set(0)
-        self.frame_recuperos.switch_all()
-        self.frame_sist_propios.var_switch_all.set(0)
-        self.frame_sist_propios.switch_all()
-        self.frame_recursos.var_switch_all.set(0)
-        self.frame_recursos.switch_all()
-        self.frame_gastos.var_switch_all.set(0)
-        self.frame_gastos.switch_all()
 
     def setupTabViewDUU(
         self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
@@ -336,16 +286,5 @@ class MainWindowUI():
         
         self.button_start = DefaultButton(
             self.frame_process, text="Process", 
-            command=self.beginProcess
         )
         self.button_start.grid(row = 0, column = 4, padx = 10, pady = 10)
-
-    def beginProcess(self):
-        if self.var_download.get() == 1:
-            print("Download")
-
-        if self.var_update.get() == 1:
-            print("Update")
-
-        if self.var_upload.get() == 1:
-            print("Upload")

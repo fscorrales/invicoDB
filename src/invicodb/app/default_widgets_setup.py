@@ -106,6 +106,13 @@ class MyScrollableCheckboxFrame(DefaultScrollableFrame):
                 checked_checkboxes.append(checkbox.cget("text"))
         return checked_checkboxes
     
+    def get_variable(self):
+        checked_checkboxes = []
+        for checkbox in self.checkboxes:
+            if checkbox.get() == 1:
+                checked_checkboxes.append(checkbox.cget("variable"))
+        return checked_checkboxes
+    
     def switch_all(self):
         if self.var_switch_all.get() == 1:
             for checkbox in self.checkboxes:
