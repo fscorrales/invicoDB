@@ -4,6 +4,7 @@ Author: Tom Schimansky
 License: 
 Source: https://github.com/TomSchimansky/CustomTkinter
 Custom Theme: https://github.com/avalon60/ctk_theme_builder
+pyinstaller: https://customtkinter.tomschimansky.com/documentation/packaging
 """
 
 
@@ -21,22 +22,14 @@ class App(ctk.CTk):
             self, padx_frame=10, pady_frame=10
         )
         MainWindowFct(main_window)
-
-        # self.readonly_combo_list = ["Readonly combobox", "Item 1", "Item 2"]
-        # self.readonly_combo = ctk.CTkOptionMenu(
-        #     self, values=self.readonly_combo_list
-        # )
-        # self.readonly_combo.set("Readonly combobox")
-        # self.readonly_combo.grid()
-
-        #Last
+        self.resizable(False, False)
         self.centerApp()
 
     def centerApp(self):
         self.update()
         self.minsize(self.winfo_width(), self.winfo_height())
         x_cordinate = int((self.winfo_screenwidth() / 2) - (self.winfo_width() / 2))
-        y_cordinate = int((self.winfo_screenheight() / 2) - (self.winfo_height() / 2))
+        y_cordinate = int((self.winfo_screenheight() / 2 - 20) - (self.winfo_height() / 2))
         self.geometry("+{}+{}".format(x_cordinate, y_cordinate-20))
 
 

@@ -12,27 +12,30 @@ class MainWindowUI():
     column_frame:int = 0
     padding_frame:int = 20
     padx_frame:int = 20
-    pady_frame:int = 10
+    pady_frame:int = 5
     padx_checkbox:int = 5
     pady_checkbox:int = 5
 
     def __post_init__(self):
-        self.setupInitialParametersFrame(row=0, column=0, columnspan=3) 
-        self.setupSIIFFrame(row=1, column=0, rowspan=2)
-        self.setupSGFFrame(row=1, column=1)
-        self.setupSSCCFrame(row=2, column=1)
-        self.setupSistemaRecuperosFrame(row=1, column=2)
-        self.setupSistemasPropiosFrame(row=2, column=2)
-        self.setupProcessFrame(row=3, column=0, columnspan=3)
+        self.setupInitialParametersFrame(row=0, column=0, columnspan=3)
+        self.setupTabViewDUU(row=1, column=0, columnspan=3)
+        self.setupSIIFFrame(row=0, column=0, rowspan=2)
+        self.setupSGFFrame(row=0, column=1)
+        self.setupSSCCFrame(row=1, column=1)
+        self.setupSistemaRecuperosFrame(row=0, column=2)
+        self.setupSistemasPropiosFrame(row=1, column=2)
+        self.setupProcessFrame(row=2, column=0, columnspan=3)
+        self.setupRecursosFrame(row=0, column=0)
+        self.setupGastosFrame(row=0, column=1)
 
     def setupInitialParametersFrame(
-            self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
         self.frame_process = DefaultFrame(self.master)
         self.frame_process.configure(height=50)
         self.frame_process.grid(
             row=row, column=column, rowspan=rowspan, columnspan=columnspan,
-            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew",             
+            padx=self.padx_frame, pady=0, sticky="nsew",             
         )
         for index in [1, 2, 3, 4]:
             self.frame_process.columnconfigure(index=index, weight=1)
@@ -93,6 +96,7 @@ class MainWindowUI():
             self.frame_siif.var_rcg01_uejp.set(1)
             self.frame_siif.var_rfondo07tp.set(1)
             self.frame_sscc.var_ctas_ctes.set(1)
+            self.frame_gastos.var_ctrl_icaro.set(1)
         elif choice == "Completo":
             self.unselectAllCheakBoxes()
             self.frame_siif.var_switch_all.set(1)
@@ -105,16 +109,14 @@ class MainWindowUI():
             self.frame_recuperos.switch_all()
             self.frame_sist_propios.var_switch_all.set(1)
             self.frame_sist_propios.switch_all()
+            self.frame_recursos.var_switch_all.set(1)
+            self.frame_recursos.switch_all()
+            self.frame_gastos.var_switch_all.set(1)
+            self.frame_gastos.switch_all()
         elif choice == "Completo Sin Recuperos":
-            self.unselectAllCheakBoxes()
-            self.frame_siif.var_switch_all.set(1)
-            self.frame_siif.switch_all()
-            self.frame_sgf.var_switch_all.set(1)
-            self.frame_sgf.switch_all()
-            self.frame_sscc.var_switch_all.set(1)
-            self.frame_sscc.switch_all()
-            self.frame_sist_propios.var_switch_all.set(1)
-            self.frame_sist_propios.switch_all()
+            self.processTypeCallback("Completo")
+            self.frame_recuperos.var_switch_all.set(0)
+            self.frame_recuperos.switch_all()
 
     def unselectAllCheakBoxes(self):
         self.frame_siif.var_switch_all.set(0)
@@ -127,9 +129,25 @@ class MainWindowUI():
         self.frame_recuperos.switch_all()
         self.frame_sist_propios.var_switch_all.set(0)
         self.frame_sist_propios.switch_all()
+        self.frame_recursos.var_switch_all.set(0)
+        self.frame_recursos.switch_all()
+        self.frame_gastos.var_switch_all.set(0)
+        self.frame_gastos.switch_all()
+
+    def setupTabViewDUU(
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+    ):
+        self.tabview_duu = DefaultTabView(self.master)
+        self.tabview_duu.configure(width=1050, height=595)
+        self.tab_download_update = self.tabview_duu.add('Download & Update')
+        self.tab_upload = self.tabview_duu.add('Upload (Google Sheet)')
+        self.tabview_duu.grid(
+            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
+            padx=self.padx_frame, pady=0, sticky="nsew", 
+        )
 
     def setupSIIFFrame(
-            self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
         
         values_and_vars = {
@@ -145,7 +163,7 @@ class MainWindowUI():
             'Formulación Gastos (rfp_p605b)':'var_rfp_p605b',
         }
         self.frame_siif = MyScrollableCheckboxFrame(
-            self.master, title="SIIF", 
+            self.tab_download_update, title="SIIF", 
             values_and_vars=values_and_vars,
             padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
         )
@@ -156,7 +174,7 @@ class MainWindowUI():
         )
 
     def setupSGFFrame(
-            self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
 
         values_and_vars = {
@@ -166,7 +184,7 @@ class MainWindowUI():
             'Listado de Proveedores':'var_listado_prov',
         }
         self.frame_sgf = MyScrollableCheckboxFrame(
-            self.master, title="Sistema de Gestión Financiera (SGF)", 
+            self.tab_download_update, title="Sistema de Gestión Financiera (SGF)", 
             values_and_vars=values_and_vars,
             padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
         )
@@ -176,7 +194,7 @@ class MainWindowUI():
         )
 
     def setupSSCCFrame(
-            self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
 
         values_and_vars = {
@@ -185,7 +203,7 @@ class MainWindowUI():
             'Saldo Final Banco INVICO (Manual)':'var_sdo_final_banco_invico',
         }
         self.frame_sscc = MyScrollableCheckboxFrame(
-            self.master, title="Sistema de Seguimiento de Ctas Ctes (SSCC)", 
+            self.tab_download_update, title="Sistema de Seguimiento de Ctas Ctes (SSCC)", 
             values_and_vars=values_and_vars,
             padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
         )
@@ -195,7 +213,7 @@ class MainWindowUI():
         )
 
     def setupSistemaRecuperosFrame(
-            self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
 
         values_and_vars = {
@@ -209,7 +227,7 @@ class MainWindowUI():
             'Resumen Recaudado':'var_resumen_recaudado',
         }
         self.frame_recuperos = MyScrollableCheckboxFrame(
-            self.master, title="Sistema Recuperos", values_and_vars=values_and_vars,
+            self.tab_download_update, title="Sistema Recuperos", values_and_vars=values_and_vars,
             padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
         )
         self.frame_recuperos.grid(
@@ -218,15 +236,15 @@ class MainWindowUI():
         )
 
     def setupSistemasPropiosFrame(
-            self, row:int = 1, column:int = 0, 
-            rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, 
+        rowspan:int = 1, columnspan:int = 1
     ):
         values_and_vars = {
             'Icaro': 'var_icaro',
             'Sist. Automática de Imputación de Hon.': 'var_saihp',
         }
         self.frame_sist_propios = MyScrollableCheckboxFrame(
-            self.master, title="Sistemas Propios", values_and_vars=values_and_vars,
+            self.tab_download_update, title="Sistemas Propios", values_and_vars=values_and_vars,
             padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
         )
         self.frame_sist_propios.grid(
@@ -235,7 +253,7 @@ class MainWindowUI():
         )
 
     def setupProcessFrame(
-            self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
         self.frame_process = DefaultFrame(self.master)
         self.frame_process.configure(height=50)
@@ -243,7 +261,7 @@ class MainWindowUI():
             row=row, column=column, rowspan=rowspan, columnspan=columnspan,
             padx=self.padx_frame, pady=self.pady_frame, sticky="nsew",             
         )
-        for index in [0, 1, 2]:
+        for index in [0, 1, 2, 4]:
             self.frame_process.columnconfigure(index=index, weight=1)
         
         self.var_download = ctk.BooleanVar(value=True)
@@ -274,4 +292,50 @@ class MainWindowUI():
             self.frame_process, text="Process", 
             #command=self.process
         )
-        self.button_start.grid(row = 1, column = 1, padx = 10, pady = 10)
+        self.button_start.grid(row = 0, column = 4, padx = 10, pady = 10)
+
+    def setupRecursosFrame(
+        self, row:int = 0, column:int = 0, rowspan:int = 1, columnspan:int = 1
+    ):
+
+        values_and_vars = {
+            'Control Recursos':'var_ctrl_recursos',
+            # 'Evolución de Saldos por Barrio':'var_saldo_barrio_variacion',
+            # 'Variación de Saldos Recuperos a Cobrar':'var_saldo_recuperos_cobrar_variacion',
+            # 'Evolución de Saldos por Motivos':'var_saldo_motivo',
+            # 'Evolución de Saldos por Motivos por Barrio':'var_saldo_motivo_por_barrio',
+            # 'Barrios Nuevos Incorporados':'var_barrios_nuevos',
+            # 'Resumen Facturado':'var_resumen_facturado',
+            # 'Resumen Recaudado':'var_resumen_recaudado',
+        }
+        self.frame_recursos = MyScrollableCheckboxFrame(
+            self.tab_upload, title="Recursos", values_and_vars=values_and_vars,
+            padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
+        )
+        self.frame_recursos.grid(
+            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
+            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
+        )
+
+    def setupGastosFrame(
+        self, row:int = 0, column:int = 0, rowspan:int = 1, columnspan:int = 1
+    ):
+
+        values_and_vars = {
+            'Control Icaro':'var_ctrl_icaro',
+            # 'Evolución de Saldos por Barrio':'var_saldo_barrio_variacion',
+            # 'Variación de Saldos Recuperos a Cobrar':'var_saldo_recuperos_cobrar_variacion',
+            # 'Evolución de Saldos por Motivos':'var_saldo_motivo',
+            # 'Evolución de Saldos por Motivos por Barrio':'var_saldo_motivo_por_barrio',
+            # 'Barrios Nuevos Incorporados':'var_barrios_nuevos',
+            # 'Resumen Facturado':'var_resumen_facturado',
+            # 'Resumen Recaudado':'var_resumen_recaudado',
+        }
+        self.frame_gastos = MyScrollableCheckboxFrame(
+            self.tab_upload, title="Gastos", values_and_vars=values_and_vars,
+            padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
+        )
+        self.frame_gastos.grid(
+            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
+            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
+        )

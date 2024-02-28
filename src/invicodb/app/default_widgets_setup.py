@@ -12,6 +12,11 @@ class DefaultScrollableFrame(ctk.CTkScrollableFrame):
         # kwargs['height'] = 100
         super().__init__(master, **kwargs)
 
+class DefaultTabView(ctk.CTkTabview):
+    def __init__(self, master, **kwargs):
+        # kwargs['width'] = 300
+        super().__init__(master, **kwargs)
+
 class DefaultCheckBox(ctk.CTkCheckBox):
     def __init__(self, master, **kwargs):
         # kwargs['label_text'] = 'Prueba'
@@ -67,7 +72,7 @@ class MyScrollableCheckboxFrame(DefaultScrollableFrame):
             self, master, title:str, values_and_vars:dict, 
             padx_checkbox:int = 5, pady_checkbox:int = 5
     ):
-        super().__init__(master, label_text=title)
+        super().__init__(master, label_text=title, height=100)
         for index in [0, 1, 2]:
             self.columnconfigure(index=index, weight=1)
             # self.rowconfigure(index=index, weight=1)
