@@ -252,48 +252,6 @@ class MainWindowUI():
             padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
         )
 
-    def setupProcessFrame(
-        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
-    ):
-        self.frame_process = DefaultFrame(self.master)
-        self.frame_process.configure(height=50)
-        self.frame_process.grid(
-            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
-            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew",             
-        )
-        for index in [0, 1, 2, 4]:
-            self.frame_process.columnconfigure(index=index, weight=1)
-        
-        self.var_download = ctk.BooleanVar(value=True)
-        self.switch_download = DefaultSwitch(
-            self.frame_process, text="Download", variable=self.var_download,
-        )
-        self.switch_download.grid(
-            row = 0, column = 0, padx = 10, pady = 10
-        )
-
-        self.var_update = ctk.BooleanVar(value=True)
-        self.switch_update = DefaultSwitch(
-            self.frame_process, text="Update", variable=self.var_update,
-        )
-        self.switch_update.grid(
-            row = 0, column = 1, padx = 10, pady = 10
-        )
-
-        self.var_upload = ctk.BooleanVar(value=True)
-        self.switch_upload = DefaultSwitch(
-            self.frame_process, text="Upload", variable=self.var_upload,
-        )
-        self.switch_upload.grid(
-            row = 0, column = 2, padx = 10, pady = 10
-        )
-        
-        self.button_start = DefaultButton(
-            self.frame_process, text="Process", 
-            #command=self.process
-        )
-        self.button_start.grid(row = 0, column = 4, padx = 10, pady = 10)
-
     def setupRecursosFrame(
         self, row:int = 0, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
@@ -339,3 +297,55 @@ class MainWindowUI():
             row=row, column=column, rowspan=rowspan, columnspan=columnspan,
             padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
         )
+
+    def setupProcessFrame(
+        self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
+    ):
+        self.frame_process = DefaultFrame(self.master)
+        self.frame_process.configure(height=50)
+        self.frame_process.grid(
+            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
+            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew",             
+        )
+        for index in [0, 1, 2, 4]:
+            self.frame_process.columnconfigure(index=index, weight=1)
+        
+        self.var_download = ctk.BooleanVar(value=True)
+        self.switch_download = DefaultSwitch(
+            self.frame_process, text="Download", variable=self.var_download,
+        )
+        self.switch_download.grid(
+            row = 0, column = 0, padx = 10, pady = 10
+        )
+
+        self.var_update = ctk.BooleanVar(value=True)
+        self.switch_update = DefaultSwitch(
+            self.frame_process, text="Update", variable=self.var_update,
+        )
+        self.switch_update.grid(
+            row = 0, column = 1, padx = 10, pady = 10
+        )
+
+        self.var_upload = ctk.BooleanVar(value=True)
+        self.switch_upload = DefaultSwitch(
+            self.frame_process, text="Upload", variable=self.var_upload,
+        )
+        self.switch_upload.grid(
+            row = 0, column = 2, padx = 10, pady = 10
+        )
+        
+        self.button_start = DefaultButton(
+            self.frame_process, text="Process", 
+            command=self.beginProcess
+        )
+        self.button_start.grid(row = 0, column = 4, padx = 10, pady = 10)
+
+    def beginProcess(self):
+        if self.var_download.get() == 1:
+            print("Download")
+
+        if self.var_update.get() == 1:
+            print("Update")
+
+        if self.var_upload.get() == 1:
+            print("Upload")

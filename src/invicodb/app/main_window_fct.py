@@ -15,7 +15,8 @@ class MainWindowFct():
         self.pressProcess()
 
     def pressProcess(self):
-        print("Process")
+        pass
+
 
     # def processTypeCallback(self, choice):
     #     if choice == "Completo":
