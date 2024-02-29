@@ -228,14 +228,19 @@ class MainWindowUI():
     ):
 
         values_and_vars = {
+            'Ejecución Anual Gastos':'var_ejec_gastos',
+            'Comprobantes Gastos':'var_comprobantes_gastos',
+            'Ejecución Obras':'var_ejec_obras',
+            'Ejecución Fondos Provinciales':'var_ejec_fdos_provinciales',
+            'Ejecución Módulos Básicos':'var_ejec_mod_basicos',
+            'Ejecución Fondos Permanentes':'var_ejec_fdos_permanentes',
             'Control Icaro':'var_ctrl_icaro',
-            # 'Evolución de Saldos por Barrio':'var_saldo_barrio_variacion',
-            # 'Variación de Saldos Recuperos a Cobrar':'var_saldo_recuperos_cobrar_variacion',
-            # 'Evolución de Saldos por Motivos':'var_saldo_motivo',
-            # 'Evolución de Saldos por Motivos por Barrio':'var_saldo_motivo_por_barrio',
-            # 'Barrios Nuevos Incorporados':'var_barrios_nuevos',
-            # 'Resumen Facturado':'var_resumen_facturado',
-            # 'Resumen Recaudado':'var_resumen_recaudado',
+            'Control Obras':'var_ctrl_obras',
+            'Control Haberes':'var_ctrl_haberes',
+            'Control Honorarios':'var_ctrl_honorarios',
+            'Control Escribanos (FEI)':'var_ctrl_escribanos',
+            'Control Retenciones':'var_ctrl_retenciones',
+            'Control Débitos Bancarios':'var_ctrl_debitos_bancarios',
         }
         self.frame_gastos = MyScrollableCheckboxFrame(
             self.tab_upload, title="Gastos", values_and_vars=values_and_vars,

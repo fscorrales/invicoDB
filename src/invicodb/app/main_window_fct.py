@@ -426,12 +426,36 @@ class MainWindowFct():
             if self.mw.frame_recursos.var_flujo_caja.get() == 1:
                 upload.upload_flujo_caja(ejercicios_varios)
             if self.mw.frame_recursos.var_ctrl_3_porc_invico.get() == 1:
-                upload.upload_control_3_porciento_invico(ejercicios_varios)
+                upload.upload_control_3_porciento_invico([ejercicio_actual, ejercicio_anterior])
 
         gastos_list = self.mw.frame_gastos.getText()
         if len(gastos_list) > 0:
-
+            #self.upload_planillometro()
+            #self.upload_formulacion_gtos()
+            if (self.mw.frame_gastos.var_ejec_gastos.get() == 1 or 
+                self.mw.frame_gastos.var_comprobantes_gastos.get() == 1):
+                upload.upload_ejecucion_gtos(ejercicios_varios)
+            if (self.mw.frame_gastos.var_ejec_obras.get() == 1 or 
+                self.mw.frame_gastos.var_ejec_mod_basicos.get() == 1):
+                upload.upload_ejecucion_pres() #Sin determinar ejercicios?
+                upload.upload_planillometro()  #No debería separarlo?
+            if self.mw.frame_gastos.var_ejec_fdos_provinciales.get() == 1:
+                upload.upload_ejecucion_obras_fondos_prov(ejercicios_varios)
+            if self.mw.frame_gastos.var_ejec_fdos_permanentes.get() == 1:
+                upload.upload_fondos_perm_cajas_chicas(ejercicios_varios)
             if self.mw.frame_gastos.var_ctrl_icaro.get() == 1:
                 upload.upload_control_icaro(ejercicios_varios)
+            if self.mw.frame_gastos.var_ctrl_obras.get() == 1:
+                upload.upload_control_obras(ejercicios_varios)
+            if self.mw.frame_gastos.var_ctrl_haberes.get() == 1:
+                upload.upload_control_haberes([ejercicio_actual, ejercicio_anterior])
+            if self.mw.frame_gastos.var_ctrl_honorarios.get() == 1:
+                upload.upload_control_honorarios([ejercicio_actual, ejercicio_anterior])
+            if self.mw.frame_gastos.var_ctrl_escribanos.get() == 1:
+                upload.upload_control_escribanos([ejercicio_actual, ejercicio_anterior])
+            if self.mw.frame_gastos.var_ctrl_retenciones.get() == 1:
+                upload.upload_control_retenciones([ejercicio_actual, ejercicio_anterior])
+            if self.mw.frame_gastos.var_ctrl_debitos_bancarios.get() == 1:
+                upload.upload_control_debitos_bancarios([ejercicio_actual, ejercicio_anterior])
 
         print('***Finalizando subida de datos a Google Sheet***')
