@@ -208,14 +208,11 @@ class MainWindowUI():
     ):
 
         values_and_vars = {
+            'Ejecución Anual Recursos':'var_ejec_recursos',
+            'Comprobantes Recursos':'var_comprobantes_recursos',
+            'Flujo de Caja':'var_flujo_caja',
             'Control Recursos':'var_ctrl_recursos',
-            # 'Evolución de Saldos por Barrio':'var_saldo_barrio_variacion',
-            # 'Variación de Saldos Recuperos a Cobrar':'var_saldo_recuperos_cobrar_variacion',
-            # 'Evolución de Saldos por Motivos':'var_saldo_motivo',
-            # 'Evolución de Saldos por Motivos por Barrio':'var_saldo_motivo_por_barrio',
-            # 'Barrios Nuevos Incorporados':'var_barrios_nuevos',
-            # 'Resumen Facturado':'var_resumen_facturado',
-            # 'Resumen Recaudado':'var_resumen_recaudado',
+            'Control 3% INVICO':'var_ctrl_3_porc_invico',
         }
         self.frame_recursos = MyScrollableCheckboxFrame(
             self.tab_upload, title="Recursos", values_and_vars=values_and_vars,

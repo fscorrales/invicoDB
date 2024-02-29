@@ -419,8 +419,14 @@ class MainWindowFct():
         recursos_list = self.mw.frame_recursos.getText()
         if len(recursos_list) > 0:
 
-            if self.mw.frame_recursos.var_ctrl_recursos.get() == 1:
+            if (self.mw.frame_recursos.var_ejec_recursos.get() == 1 or 
+                self.mw.frame_recursos.var_comprobantes_recursos.get() == 1 or
+                self.mw.frame_recursos.var_ctrl_recursos.get() == 1):
                 upload.upload_control_recursos(ejercicios_varios)
+            if self.mw.frame_recursos.var_flujo_caja.get() == 1:
+                upload.upload_flujo_caja(ejercicios_varios)
+            if self.mw.frame_recursos.var_ctrl_3_porc_invico.get() == 1:
+                upload.upload_control_3_porciento_invico(ejercicios_varios)
 
         gastos_list = self.mw.frame_gastos.getText()
         if len(gastos_list) > 0:
