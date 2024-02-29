@@ -8,12 +8,11 @@ pyinstaller: https://customtkinter.tomschimansky.com/documentation/packaging
 """
 
 
-import os
 import customtkinter as ctk
 
-from ..hangling_path import HanglingPath
-from .main_window_ui import MainWindowUI
 from .main_window_fct import MainWindowFct
+from .main_window_ui import MainWindowUI
+
 
 class App(ctk.CTk):
     def __init__(self):

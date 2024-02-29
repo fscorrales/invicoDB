@@ -250,7 +250,11 @@ class DownloadSIIF():
             if folder != root_dir:
                 for f in files:
                     # https://stackoverflow.com/questions/33743816/how-to-find-a-filename-that-contains-a-given-string
-                    if 'html' in f:
+                    # if 'html' in f:
+                    #     file_path = os.path.join(folder, f)
+                    #     os.remove(file_path)
+                    #     print(f"File: {file_path} removed")
+                    if '.htm' in f:
                         file_path = os.path.join(folder, f)
                         os.remove(file_path)
                         print(f"File: {file_path} removed")

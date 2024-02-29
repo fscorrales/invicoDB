@@ -1,5 +1,7 @@
-import customtkinter as ctk
 from dataclasses import dataclass
+
+import customtkinter as ctk
+
 
 class DefaultFrame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):

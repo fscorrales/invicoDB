@@ -1,9 +1,10 @@
+import datetime as dt
 from dataclasses import dataclass
 
 import customtkinter as ctk
-import datetime as dt
 
 from .default_widgets_setup import *
+
 
 @dataclass
 class MainWindowUI():
@@ -191,7 +192,7 @@ class MainWindowUI():
     ):
         values_and_vars = {
             'Icaro': 'var_icaro',
-            'Sist. Automática de Imputación de Hon.': 'var_saihp',
+            'Slave': 'var_slave',
         }
         self.frame_sist_propios = MyScrollableCheckboxFrame(
             self.tab_download_update, title="Sistemas Propios", values_and_vars=values_and_vars,
