@@ -46,15 +46,6 @@ class MainWindowFct():
     def processTypeCallback(self, choice):
         if choice == "Personalizado":
             self.mw.unselectAllCheakBoxes()
-        elif choice == "Control Icaro":
-            self.unselectAllCheakBoxes()
-            self.mw.frame_sist_propios.var_icaro.set(1)
-            self.mw.frame_siif.var_rf602.set(1)
-            self.mw.frame_siif.var_gto_rpa03g.set(1)
-            self.mw.frame_siif.var_rcg01_uejp.set(1)
-            self.mw.frame_siif.var_rfondo07tp.set(1)
-            self.mw.frame_sscc.var_ctas_ctes.set(1)
-            self.mw.frame_gastos.var_ctrl_icaro.set(1)
         elif choice == "Completo":
             self.unselectAllCheakBoxes()
             self.mw.frame_siif.var_switch_all.set(1)
@@ -75,6 +66,122 @@ class MainWindowFct():
             self.processTypeCallback("Completo")
             self.mw.frame_recuperos.var_switch_all.set(0)
             self.mw.frame_recuperos.switchAll()
+        elif choice == "Ejecución y Control Recursos":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rci02.set(1)
+            self.mw.frame_siif.var_ri102.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_recursos.var_ejec_recursos.set(1)
+            self.mw.frame_recursos.var_comprobantes_recursos.set(1)
+            self.mw.frame_recursos.var_ctrl_recursos.set(1)
+        elif choice == "Flujo de Caja":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_recursos.var_flujo_caja.set(1)
+        elif choice == "Control 3% INVICO":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rci02.set(1)
+            self.mw.frame_siif.var_rcocc31.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_recursos.var_ctrl_3_porc_invico.set(1)
+        elif choice == "Ejecución Gastos":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rf610.set(1)
+            self.mw.frame_siif.var_rf602.set(1)
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            self.mw.frame_siif.var_rfp_p605b.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_gastos.var_ejec_gastos.set(1)
+            self.mw.frame_gastos.var_comprobantes_gastos.set(1)
+        elif choice == "Planillómetro y Ejecución Obras":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rf610.set(1)
+            self.mw.frame_siif.var_rf602.set(1)
+            self.mw.frame_sist_propios.var_icaro.set(1)
+            self.mw.frame_gastos.var_planillometro_obras.set(1)
+            self.mw.frame_gastos.var_ejec_obras.set(1)
+            self.mw.frame_gastos.var_ejec_fdos_provinciales.set(1)
+            self.mw.frame_gastos.var_ejec_mod_basicos.set(1)
+        elif choice == "Fondos Permanentes y Cajas Chicas":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            # Falta un reporte SIIF rog01 (solo una vez)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_gastos.var_ejec_fdos_permanentes.set(1)
+        elif choice == "Control Icaro":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_sist_propios.var_icaro.set(1)
+            self.mw.frame_siif.var_rf602.set(1)
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            self.mw.frame_siif.var_rfondo07tp.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_gastos.var_ctrl_icaro.set(1)
+        elif choice == "Control Obras":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rdeu012.set(1)
+            self.mw.frame_sgf.var_resumen_rend_prov.set(1)
+            self.mw.frame_sgf.var_listado_prov.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_sist_propios.var_icaro.set(1)
+            self.mw.frame_gastos.var_ctrl_obras.set(1)
+        elif choice == "Control Haberes":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_siif.var_rcocc31.set(1)
+            self.mw.frame_siif.var_rdeu012.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_gastos.var_ctrl_haberes.set(1)
+        elif choice == "Control Honorarios":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_siif.var_rcocc31.set(1)
+            self.mw.frame_sgf.var_resumen_rend_prov.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_sist_propios.var_slave.set(1)
+            self.mw.frame_gastos.var_ctrl_honorarios.set(1)
+        elif choice == "Control Honorarios":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_siif.var_rcocc31.set(1)
+            self.mw.frame_sgf.var_resumen_rend_prov.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_sist_propios.var_slave.set(1)
+            self.mw.frame_gastos.var_ctrl_honorarios.set(1)
+        elif choice == "Control Escribanos":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rcocc31.set(1)
+            self.mw.frame_sgf.var_resumen_rend_prov.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_gastos.var_ctrl_escribanos.set(1)
+        elif choice == "Control Retenciones":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rdeu012.set(1)
+            self.mw.frame_siif.var_rcocc31.set(1)
+            self.mw.frame_sgf.var_resumen_rend_prov.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_sist_propios.var_icaro.set(1)
+            self.mw.frame_gastos.var_ctrl_retenciones.set(1)
+        elif choice == "Control Débitos Bancarios":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rcg01_uejp.set(1)
+            self.mw.frame_siif.var_gto_rpa03g.set(1)
+            self.mw.frame_sscc.var_banco_invico.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_gastos.var_ctrl_debitos_bancarios.set(1)
 
     def unselectAllCheakBoxes(self):
         self.mw.frame_siif.var_switch_all.set(0)
@@ -116,11 +223,11 @@ class MainWindowFct():
             for month in range(1, 13):  # Iterar sobre los meses del año
                 fecha = dt.date(year, month, 1)  # Crear una fecha para el primer día de cada mes
                 if fecha.year < fecha_actual.year:
-                    mes_anio = fecha.strftime("%m-%Y")  # Formatear la fecha como "mm-yyyy"
+                    mes_anio = fecha.strftime("%Y-%m")  # Formatear la fecha como "mm-yyyy"
                     lista_meses.append(mes_anio)  # Agregar el mes al lista
                 elif fecha.year == fecha_actual.year:
                     if fecha.month <= fecha_actual.month:
-                        mes_anio = fecha.strftime("%m-%Y")  # Formatear la fecha como "mm-yyyy"
+                        mes_anio = fecha.strftime("%Y-%m")  # Formatear la fecha como "mm-yyyy"
                         lista_meses.append(mes_anio)  # Agregar el mes al lista
         return lista_meses
 
@@ -340,7 +447,7 @@ class MainWindowFct():
             )
 
             if self.mw.frame_sscc.var_banco_invico.get() == 1:
-                sscc.download_banco_invico()
+                sscc.update_banco_invico()
             if self.mw.frame_sscc.var_ctas_ctes.get() == 1:
                 sscc.update_ctas_ctes()
             if self.mw.frame_sscc.var_sdo_final_banco_invico.get() == 1:
@@ -435,10 +542,11 @@ class MainWindowFct():
             if (self.mw.frame_gastos.var_ejec_gastos.get() == 1 or 
                 self.mw.frame_gastos.var_comprobantes_gastos.get() == 1):
                 upload.upload_ejecucion_gtos(ejercicios_varios)
+            if self.mw.frame_gastos.var_planillometro_obras.get() == 1:
+                upload.upload_planillometro()  #Sin determinar ejercicios?
             if (self.mw.frame_gastos.var_ejec_obras.get() == 1 or 
                 self.mw.frame_gastos.var_ejec_mod_basicos.get() == 1):
                 upload.upload_ejecucion_pres() #Sin determinar ejercicios?
-                upload.upload_planillometro()  #No debería separarlo?
             if self.mw.frame_gastos.var_ejec_fdos_provinciales.get() == 1:
                 upload.upload_ejecucion_obras_fondos_prov(ejercicios_varios)
             if self.mw.frame_gastos.var_ejec_fdos_permanentes.get() == 1:

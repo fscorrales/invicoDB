@@ -227,7 +227,7 @@ class UpdateIcaro():
 
     # --------------------------------------------------
     def migrate_icaro(self):
-        print("-- Actualizando Icaro' DB --")
+        print("-- Actualizando Icaro's DB --")
         migrate_icaro.MigrateIcaro(
             self.input_path, self.output_path
         ).migrate_all()
@@ -241,6 +241,7 @@ class UpdateSlave():
 
     # --------------------------------------------------
     def migrate_slave(self):
+        print("-- Actualizando Slave's DB --")
         migrate_slave.MigrateSlave(
             self.input_path, self.output_path
         ).migrate_all()

@@ -147,6 +147,8 @@ class UploadGoogleSheet():
             - SIIF rf610
             - SIIF gto_rpa03g
             - SIIF rcg01_uejp
+            - SIIF rfp_p605b (no obligatorio)
+            - SSCC Ctas Ctes (manual data)
         """
         if ejercicio == None:
             ejercicio_metodo = self.ejercicio
@@ -328,7 +330,7 @@ class UploadGoogleSheet():
 
         # Planillometro SIIF
         self.df = ejecucion_obras.reporte_planillometro(full_icaro=False, es_desc_siif=True)
-        spreadsheet_key = '1AYeTncc1ewP8Duj13t7o6HCwAHNEWILRMNQiZHAs82I'
+        spreadsheet_key = '1DPn8eEVDyD9Ug6r03fIMGoK4NPxHsWD2a_3qITzPAIs'
         wks_name = 'planillometro_siif'
         self.gs.to_google_sheets(
             self.df,  
@@ -342,7 +344,7 @@ class UploadGoogleSheet():
         self.df = ejecucion_obras.reporte_planillometro(
             full_icaro=False, es_desc_siif=False, desagregar_fuente=False
         )
-        spreadsheet_key = '1AYeTncc1ewP8Duj13t7o6HCwAHNEWILRMNQiZHAs82I'
+        spreadsheet_key = '1DPn8eEVDyD9Ug6r03fIMGoK4NPxHsWD2a_3qITzPAIs'
         wks_name = 'planillometro_siif_sin_fte'
         self.gs.to_google_sheets(
             self.df,  
@@ -355,7 +357,7 @@ class UploadGoogleSheet():
 
         # Planillometro Icaro
         self.df = ejecucion_obras.reporte_planillometro(full_icaro=True, es_desc_siif=False)
-        spreadsheet_key = '1AYeTncc1ewP8Duj13t7o6HCwAHNEWILRMNQiZHAs82I'
+        spreadsheet_key = '1DPn8eEVDyD9Ug6r03fIMGoK4NPxHsWD2a_3qITzPAIs'
         wks_name = 'planillometro_icaro'
         self.gs.to_google_sheets(
             self.df,  
@@ -488,6 +490,7 @@ class UploadGoogleSheet():
         """Update and Upload Control Recursos
         Update requires:
             - SIIF rci02
+            - SIIF ri102
             - SSCC Consulta General de Movimiento
             - SSCC ctas_ctes (manual data)
         """
@@ -856,8 +859,11 @@ class UploadGoogleSheet():
         """Update and Upload Control Obras
         Update requires:
             - Icaro
-            - SIIF rdeu012 (para netear Icaro)
-            - SGF Resumen Rend por Proveedor
+            - SIIF rdeu012
+            - SGF Resumen de Rendiciones por Proveedor
+            - SGF Listado Proveedores
+            - SSCC Resumen General de Movimientos
+            - SSCC ctas_ctes (manual data)
         """
         if ejercicio == None:
             ejercicio = self.ejercicio
@@ -885,9 +891,10 @@ class UploadGoogleSheet():
     def upload_control_escribanos(self, ejercicio:list = None):
         """Update and Upload Control Obras
         Update requires:
-            - Icaro
-            - SIIF rdeu012 (para netear Icaro)
             - SGF Resumen Rend por Proveedor
+            - SSCC Resumen General de Movimientos
+            - SSCC ctas_ctes (manual data)
+            - SIIF rcocc31 (2113-2-9 Escribanos)
         """
         if ejercicio == None:
             ejercicio = self.ejercicio
@@ -969,9 +976,12 @@ class UploadGoogleSheet():
     def upload_control_honorarios(self, ejercicio:list = None):
         """Update and Upload Control Obras
         Update requires:
-            - Icaro
-            - SIIF rdeu012 (para netear Icaro)
-            - SGF Resumen Rend por Proveedor
+            - Slave
+            - SIIF rcg01_uejp
+            - SIIF gto_rpa03g
+            - SGF Resumen Rendicions por Proveedor
+            - SSCC Resumen General de Movimientos (para agregar dep. emb. x alim. 130832-05)
+            - SSCC ctas_ctes (manual data)
         """
         if ejercicio == None:
             ejercicio = self.ejercicio
@@ -1055,7 +1065,8 @@ class UploadGoogleSheet():
         Update requires:
             - SIIF gto_rpa03g
             - SIIF rcg01_uejp
-            - SSCC
+            - SSCC Movimientos Generales
+            - SSCC ctas_ctes (manual data)
         """
         if ejercicio == None:
             ejercicio = self.ejercicio
@@ -1115,6 +1126,7 @@ class UploadGoogleSheet():
                 1112-2-6 Banco INVICO
                 2122-1-2 Retenciones
             )
+            - SSCC ctas_ctes (manual data)
         """
         if ejercicio == None:
             ejercicio = self.ejercicio

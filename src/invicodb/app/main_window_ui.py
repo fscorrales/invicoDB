@@ -45,7 +45,19 @@ class MainWindowUI():
             'Personalizado',
             'Completo',
             'Completo Sin Recuperos',
-            'Control Icaro'
+            'Ejecución y Control Recursos',
+            'Flujo de Caja',
+            'Control 3% INVICO',
+            'Ejecución Gastos',
+            'Planillómetro y Ejecución Obras',
+            'Fondos Permanentes y Cajas Chicas',
+            'Control Icaro',
+            'Control Obras',
+            'Control Haberes',
+            'Control Honorarios',
+            'Control Escribanos',
+            'Control Retenciones',
+            'Control Débitos Bancarios',
         ]
         var_option_process_type = ctk.StringVar(value="Personalizado")
         self.optional_process_type = DefaultOptionMenu(
@@ -230,6 +242,7 @@ class MainWindowUI():
         values_and_vars = {
             'Ejecución Anual Gastos':'var_ejec_gastos',
             'Comprobantes Gastos':'var_comprobantes_gastos',
+            'Planillómetro Obras':'var_planillometro_obras',
             'Ejecución Obras':'var_ejec_obras',
             'Ejecución Fondos Provinciales':'var_ejec_fdos_provinciales',
             'Ejecución Módulos Básicos':'var_ejec_mod_basicos',
@@ -246,6 +259,7 @@ class MainWindowUI():
             self.tab_upload, title="Gastos", values_and_vars=values_and_vars,
             padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
         )
+        self.frame_gastos.configure(height=475)
         self.frame_gastos.grid(
             row=row, column=column, rowspan=rowspan, columnspan=columnspan,
             padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
