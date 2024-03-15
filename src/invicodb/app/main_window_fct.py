@@ -17,8 +17,13 @@ class MainWindowFct():
     mw: MainWindowUI
 
     def __post_init__(self):
+        self.disableDownloadCheckBoxes()
         self.configureProcessOptionMenu()
         self.configureButtonBeginProcess()
+
+    def disableDownloadCheckBoxes(self):
+        self.mw.frame_recuperos.var_resumen_facturado.set(0)
+        self.mw.frame_recuperos.var_resumen_recaudado.set(0)
 
     def configureProcessOptionMenu(self):
         self.mw.optional_process_type.configure(
@@ -206,6 +211,7 @@ class MainWindowFct():
 
     def beginProcess(self):
         if self.mw.var_download.get() == 1:
+            self.disableDownloadCheckBoxes()
             self.processDownload()
 
         if self.mw.var_update.get() == 1:
