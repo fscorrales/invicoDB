@@ -15,6 +15,7 @@ from invicodatpy.siif import *
 from invicodatpy.slave import *
 from invicodatpy.sscc import *
 from invicodatpy.sgv import *
+from invicodatpy.sgo import *
 
 from ..hangling_path import HanglingPath
 
@@ -345,6 +346,27 @@ class UpdateSGV():
             output_path=self.output_path, clean_first=True)
 
 # --------------------------------------------------
+@dataclass
+class UpdateSGO():
+    """Read, process and write INVICO DB"""
+    input_path:str
+    output_path:str
+
+    # --------------------------------------------------
+    def update_all_sgo_tables(self):
+        self.update_listado_obras()
+
+    # --------------------------------------------------
+    def update_listado_obras(self):
+        lo = listado_obras.ListadoObras()
+        full_input_path = os.path.join(
+            self.input_path, 'Listado de Obras', 'Obras Completo.xls'
+        )
+        lo.from_external_report(full_input_path)
+        lo.to_sql(
+            sql_path=self.output_path, replace=True)
+
+# --------------------------------------------------
 def get_args():
     """Get needed params from user input"""
     parser = argparse.ArgumentParser(
@@ -404,10 +426,14 @@ def main():
     #     os.path.join(input_path, 'Slave/Slave.mdb'), 
     #     os.path.join(output_path, 'slave.sqlite')
     #     ).migrate_slave()
-    UpdateSGV(
-        os.path.join(input_path, 'Gestión Vivienda GV'), 
-        os.path.join(output_path, 'sgv.sqlite')
-        ).update_all_sgv_tables()
+    # UpdateSGV(
+    #     os.path.join(input_path, 'Gestión Vivienda GV'), 
+    #     os.path.join(output_path, 'sgv.sqlite')
+    #     ).update_all_sgv_tables()
+    UpdateSGO(
+        os.path.join(input_path, 'Sistema Gestion Obras'), 
+        os.path.join(output_path, 'sgo.sqlite')
+        ).update_all_sgo_tables()
         
 # --------------------------------------------------
 if __name__ == '__main__':

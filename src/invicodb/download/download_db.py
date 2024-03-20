@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 
 from invicodatpy.sgf import *
 from invicodatpy.sgv import *
+from invicodatpy.sgo import *
 from invicodatpy.siif import *
 from invicodatpy.sscc import *
 from selenium import webdriver
@@ -546,6 +547,65 @@ class DownloadSGV():
 
 # --------------------------------------------------
 @dataclass
+class DownloadSGO():
+    """Download SGO' reports
+    :param path_credentials_file: json file with SGO' credentials
+    :param input_path: If update_db is True '/Base de Datos' path must be given
+    :param output_path: If update_db is True 'Python Output/SQLite Files' must be given
+    """
+    path_credentials_file:str
+    output_path:str
+    download_all:bool = field(init=False, repr=False, default=False)
+    sgo_connection:webdriver = field(init=False, repr=False)
+
+    # --------------------------------------------------
+    def __post_init__(self):
+        print('--- Iniciando descarga de DB SGO ---')
+        print('- Connect to SGO -')
+        if os.path.isfile(self.path_credentials_file):
+            with open(self.path_credentials_file) as json_file:
+                data_json = json.load(json_file)
+                self.sgo_connection =connect_sgo.ConnectSGO(
+                    data_json['username'], data_json['password']
+                )
+            print('- Connection Done -')
+            json_file.close()
+        else:
+            print('El ruta del archivo json con las credenciales de acceso no es válida')
+            print(self.path_credentials_file)
+
+    # --------------------------------------------------
+    def download_all_sgo_tables(self):
+        try:
+            print("- Iniciando descarga masiva de reportes SGO -")
+            self.download_all = True
+            self.download_listado_obras()
+
+        except Exception as e:
+            print(f"Ocurrió un error: {e}, {type(e)}")
+            self.sgo_connection.disconnect() 
+        finally:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_listado_obras(self):
+        print("- Descargando SGO Listado de Obras -")
+        df = listado_obras.ListadoObras(sgo = self.sgo_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Listado de Obras'
+        )
+        df.download_report(full_output_path)
+        self.sgo_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def quit(self):
+        # self.remove_html_files()
+        self.sgo_connection.disconnect()
+
+# --------------------------------------------------
+@dataclass
 class CopyIcaro():
     """Copy Icaro DB from Exequiel's PC to mine
     :param exequiel_path
@@ -634,10 +694,10 @@ def main():
     #     output_path=os.path.join(output_path, 'Sistema de Seguimiento de Cuentas Corrientes')
     #     ).download_all_sscc_tables()
 
-    DownloadSGF(
-        path_credentials_file=invico_credentials_path,
-        output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
-        ).download_all_sgf_tables()
+    # DownloadSGF(
+    #     path_credentials_file=invico_credentials_path,
+    #     output_path=os.path.join(output_path, 'Sistema Gestion Financiera')
+    #     ).download_all_sgf_tables()
 
     # output_path = HanglingPath().get_outside_path()
     # exequiel_path = HanglingPath().get_r_icaro_path()
@@ -647,14 +707,19 @@ def main():
     #     my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
     # )
 
-    # sgv_credentials_path = os.path.join(
-    #     credentials_path, 'sgv_credentials.json'
-    # )
+    sg_credentials_path = os.path.join(
+        credentials_path, 'sgv_credentials.json'
+    )
 
     # DownloadSGV(
-    #     path_credentials_file=sgv_credentials_path,
+    #     path_credentials_file=sg_credentials_path,
     #     output_path=os.path.join(output_path, 'Gestión Vivienda GV')
     #     ).download_all_sgv_tables()  
+
+    DownloadSGO(
+        path_credentials_file=sg_credentials_path,
+        output_path=os.path.join(output_path, 'Sistema Gestion Obras')
+        ).download_all_sgo_tables()  
         
 # --------------------------------------------------
 if __name__ == '__main__':
