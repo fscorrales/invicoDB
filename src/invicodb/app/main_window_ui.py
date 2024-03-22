@@ -20,11 +20,12 @@ class MainWindowUI():
     def __post_init__(self):
         self.setupInitialParametersFrame(row=0, column=0, columnspan=3)
         self.setupTabViewDUU(row=1, column=0, columnspan=3)
-        self.setupSIIFFrame(row=0, column=0, rowspan=2)
+        self.setupSIIFFrame(row=0, column=0)
+        self.setupSistemasPropiosFrame(row=1, column=0)
         self.setupSGFFrame(row=0, column=1)
         self.setupSSCCFrame(row=1, column=1)
         self.setupSistemaRecuperosFrame(row=0, column=2)
-        self.setupSistemasPropiosFrame(row=1, column=2)
+        self.setupSGOFrame(row=1, column=2)
         self.setupProcessFrame(row=2, column=0, columnspan=3)
         self.setupRecursosFrame(row=0, column=0)
         self.setupGastosFrame(row=0, column=1)
@@ -53,6 +54,7 @@ class MainWindowUI():
             'Fondos Permanentes y Cajas Chicas',
             'Control Icaro',
             'Control Obras',
+            'Listado Obras',
             'Control Haberes',
             'Control Honorarios',
             'Control Escribanos',
@@ -215,6 +217,22 @@ class MainWindowUI():
             padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
         )
 
+    def setupSGOFrame(
+        self, row:int = 1, column:int = 0, 
+        rowspan:int = 1, columnspan:int = 1
+    ):
+        values_and_vars = {
+            'Listado Obras': 'var_listado_obras',
+        }
+        self.frame_sgo = MyScrollableCheckboxFrame(
+            self.tab_download_update, title="Sistemas Gestión Obras", values_and_vars=values_and_vars,
+            padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
+        )
+        self.frame_sgo.grid(
+            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
+            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
+        )
+
     def setupRecursosFrame(
         self, row:int = 0, column:int = 0, rowspan:int = 1, columnspan:int = 1
     ):
@@ -249,6 +267,7 @@ class MainWindowUI():
             'Ejecución Fondos Permanentes':'var_ejec_fdos_permanentes',
             'Control Icaro':'var_ctrl_icaro',
             'Control Obras':'var_ctrl_obras',
+            'Listado Obras':'var_listado_obras',
             'Control Haberes':'var_ctrl_haberes',
             'Control Honorarios':'var_ctrl_honorarios',
             'Control Escribanos (FEI)':'var_ctrl_escribanos',

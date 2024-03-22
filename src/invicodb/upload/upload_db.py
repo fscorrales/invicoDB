@@ -21,6 +21,7 @@ from invicoctrlpy.gastos.control_haberes.control_haberes import ControlHaberes
 from invicoctrlpy.gastos.control_honorarios.control_honorarios import \
     ControlHonorarios
 from invicoctrlpy.gastos.control_obras.control_obras import ControlObras
+from invicoctrlpy.gastos.control_obras.listado_obras import ListadoObras
 from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
 from invicoctrlpy.gastos.ejecucion_gastos.ejecucion_gastos import \
@@ -100,6 +101,7 @@ class UploadGoogleSheet():
         time.sleep(120)
         self.upload_flujo_caja(ejercicios_varios)
         self.upload_control_obras(ejercicios_varios)
+        self.upload_listado_obras()
         self.upload_control_haberes([ejercicio_actual, ejercicio_anterior])
         self.upload_control_retenciones([ejercicio_actual, ejercicio_anterior])
         self.upload_control_escribanos([ejercicio_actual, ejercicio_anterior])
@@ -888,6 +890,59 @@ class UploadGoogleSheet():
         print(self.df.head())
 
     # --------------------------------------------------
+    def upload_listado_obras(self):
+        """Update and Upload Listado Obras
+        Update requires:
+            - Icaro
+            - SGO Listado Obras
+        """
+
+        listado_obras = ListadoObras(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db
+        )
+
+        # Listado de Obras Icaro con Codigo Obras SGO
+        self.df = listado_obras.icaroObrasConCodObras()
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1KnKs7RXzN7QPjNjxkXQY89DWzzGecwcXoPpAYiNRxkU'
+        wks_name = 'icaro'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Listado de Obras Icaro con Codigo Obras SGO --')
+        print(self.df.head())
+
+        # Listado de Obras SGO con Imnputacion SIIF
+        self.df = listado_obras.sgoObrasConImputacion()
+        self.df['fecha_inicio'] = self.df['fecha_inicio'].dt.strftime('%d-%m-%Y')
+        self.df['fecha_fin'] = self.df['fecha_fin'].dt.strftime('%d-%m-%Y')
+        self.df = self.df.fillna('')
+        self.df = self.df.loc[:, [
+            'imputacion','cod_obra', 'obra', 
+            'contratista', 'localidad', 'tipo_obra',
+            'operatoria', 
+            'fecha_inicio', 'fecha_fin', 
+            'avance_fis_real',
+            'nro_ultimo_certif', 'mes_obra_certif', 'monto_pagado', 
+        ]]  
+        # to_numeric_cols = [
+        #     'avance_fis_real'
+        # ]
+        # self.df[to_numeric_cols] = self.df[to_numeric_cols].apply(lambda x: x.round(4))
+        spreadsheet_key = '1KnKs7RXzN7QPjNjxkXQY89DWzzGecwcXoPpAYiNRxkU'
+        wks_name = 'sistema_gestion_obras'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Listado de Obras SGO con Imnputacion SIIF --')
+        print(self.df.head())
+
+    # --------------------------------------------------
     def upload_control_escribanos(self, ejercicio:list = None):
         """Update and Upload Control Obras
         Update requires:
@@ -1293,7 +1348,7 @@ def main():
     #     
     # upload.upload_control_3_porciento_invico(['2022', '2023'])
 
-    upload.upload_all_dfs()
+    upload.upload_listado_obras()
 
 # --------------------------------------------------
 if __name__ == '__main__':

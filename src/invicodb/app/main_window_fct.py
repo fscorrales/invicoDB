@@ -135,6 +135,11 @@ class MainWindowFct():
             self.mw.frame_sscc.var_ctas_ctes.set(1)
             self.mw.frame_sist_propios.var_icaro.set(1)
             self.mw.frame_gastos.var_ctrl_obras.set(1)
+        elif choice == "Listado Obras":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_sist_propios.var_icaro.set(1)
+            self.mw.frame_sgo.var_listado_obras.set(1)
+            self.mw.frame_gastos.var_listado_obras.set(1)
         elif choice == "Control Haberes":
             self.unselectAllCheakBoxes()
             self.mw.frame_siif.var_rcg01_uejp.set(1)
@@ -365,7 +370,6 @@ class MainWindowFct():
                 recuperos.download_resumen_facturado(ejercicios)
             if self.mw.frame_recuperos.var_resumen_recaudado.get() == 1:
                 recuperos.download_resumen_recaudado(ejercicios)
-
             recuperos.quit()
 
         # Verificamos si existen reportes del Sist Propios para descargar
@@ -384,6 +388,24 @@ class MainWindowFct():
                     exequiel_path = os.path.join(exequiel_path, 'Slave.mdb'),
                     my_path = os.path.join(output_path, 'Slave/Slave.mdb')
                 )
+
+        sgo_list = self.mw.frame_sgo.getText()
+        if len(sgo_list) > 0:
+            # Cargamos credenciales e instanciamos SIIF
+            sgo_credentials_path = os.path.join(
+                credentials_path, 'sgv_credentials.json'
+            )
+            sgo = DownloadSGO(
+                path_credentials_file = sgo_credentials_path,
+                output_path = os.path.join(output_path, 'Sistema Gestion Obras'),
+            )
+            # Mantenemos abierta la conexión hasta descargar todos los reportes que necesitamos
+            sgo.download_all = True
+
+            if self.mw.frame_sgo.var_listado_obras.get() == 1:
+                sgo.download_listado_obras()
+            sgo.quit()
+
         print('***Finalizando descarga de datos***')
     def processUpdate(self):
         print('***Iniciando actualización de Base de Datos***')
@@ -500,6 +522,16 @@ class MainWindowFct():
                     os.path.join(input_path, 'Slave/Slave.mdb'), 
                     os.path.join(output_path, 'slave.sqlite')
                     ).migrate_slave()
+                
+        sgo_list = self.mw.frame_sgo.getText()
+        if len(sgo_list) > 0:
+            sgo = UpdateSGO(
+                os.path.join(input_path, 'Sistema Gestion Obras'), 
+                os.path.join(output_path,'sgo.sqlite')
+            )
+
+            if self.mw.frame_sgo.var_listado_obras.get() == 1:
+                sgo.update_listado_obras()
 
         print('***Finalizando actualización de Base de Datos***')
     def processUpload(self):
@@ -561,6 +593,8 @@ class MainWindowFct():
                 upload.upload_control_icaro(ejercicios_varios)
             if self.mw.frame_gastos.var_ctrl_obras.get() == 1:
                 upload.upload_control_obras(ejercicios_varios)
+            if self.mw.frame_gastos.var_listado_obras.get() == 1:
+                upload.upload_listado_obras()
             if self.mw.frame_gastos.var_ctrl_haberes.get() == 1:
                 upload.upload_control_haberes([ejercicio_actual, ejercicio_anterior])
             if self.mw.frame_gastos.var_ctrl_honorarios.get() == 1:
