@@ -580,6 +580,7 @@ class DownloadSGO():
             print("- Iniciando descarga masiva de reportes SGO -")
             self.download_all = True
             self.download_listado_obras()
+            self.download_lotes_certificados()
 
         except Exception as e:
             print(f"Ocurrió un error: {e}, {type(e)}")
@@ -595,6 +596,18 @@ class DownloadSGO():
             self.output_path, 'Listado de Obras'
         )
         df.download_report(full_output_path)
+        self.sgo_connection.remove_html_files(full_output_path)
+        if not self.download_all:
+            self.quit()
+
+    # --------------------------------------------------
+    def download_lotes_certificados(self, pages:str = '2'):
+        print("- Descargando SGO Lotes Certificados -")
+        df = lotes_certificados.LotesCertificados(sgo = self.sgo_connection)
+        full_output_path = os.path.join(
+            self.output_path, 'Lotes Certificados'
+        )
+        df.download_report(full_output_path, pages=pages)
         self.sgo_connection.remove_html_files(full_output_path)
         if not self.download_all:
             self.quit()
@@ -719,7 +732,7 @@ def main():
     DownloadSGO(
         path_credentials_file=sg_credentials_path,
         output_path=os.path.join(output_path, 'Sistema Gestion Obras')
-        ).download_all_sgo_tables()  
+        ).download_lotes_certificados(pages='all')  
         
 # --------------------------------------------------
 if __name__ == '__main__':

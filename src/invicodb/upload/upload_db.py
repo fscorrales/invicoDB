@@ -369,6 +369,33 @@ class UploadGoogleSheet():
         print('-- Planillometro Icaro --')
         print(self.df.head())
 
+        # Planillometro Icaro para Contabilidad
+        self.df = ejecucion_obras.reporte_planillometro_contabilidad(
+            ultimos_ejercicios = '5',
+            es_desc_siif = False
+        )
+        self.df['ejercicio'] = self.df['ejercicio'].astype(int)
+        spreadsheet_key = '1Hmb7xmzhZBoicnL5_tN7mr1kOj-r3gw8lCkPErR8Xd4'
+        wks_name = 'bd_planillometro'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Planillometro Icaro para Contabilidad --')
+        print(self.df.head())
+
+        # Variación Saldo por Barrio Recuperos
+        self.df = ejecucion_obras.import_saldo_barrio_variacion() #no me cierra mucho
+        spreadsheet_key = '1Hmb7xmzhZBoicnL5_tN7mr1kOj-r3gw8lCkPErR8Xd4'
+        wks_name = 'bd_recuperos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Variación Saldo por Barrio Recuperos --')
+        print(self.df.head())
 
     # --------------------------------------------------
     def upload_control_icaro(self, ejercicio:str = None):
