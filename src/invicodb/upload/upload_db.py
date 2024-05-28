@@ -12,6 +12,7 @@ import time
 from dataclasses import dataclass, field
 
 import pandas as pd
+from invicoctrlpy.utils.import_dataframe import ImportDataFrame
 from invicoctrlpy.banco.flujo_caja import FlujoCaja
 from invicoctrlpy.gastos.control_debitos_bancarios.control_debitos_bancarios import \
     ControlDebitosBancarios
@@ -108,6 +109,38 @@ class UploadGoogleSheet():
         self.upload_control_honorarios([ejercicio_actual, ejercicio_anterior])
         self.upload_control_debitos_bancarios([ejercicio_actual, ejercicio_anterior])
         self.upload_control_3_porciento_invico([ejercicio_actual, ejercicio_anterior])
+
+    # NO IMPLEMENTADO AÚN
+    # --------------------------------------------------
+    def upload_dbs(self, ejercicio:str = None):
+        """Update and Upload Formulacion Gastos
+        Update requires:
+            - SSCC
+            - SSCC Ctas Ctes (manual data)
+        """
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
+        db = FlujoCaja(
+            input_path=self.input_path, db_path=self.output_path,
+            update_db= self.update_db, ejercicio=ejercicio_metodo
+        )
+
+        # DB SSCC
+        self.df = db.import_banco_invico()
+        self.df = self.df.fillna('')
+        self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
+        spreadsheet_key = '1rJSM9_duCVWDyw9RrfFCc4vrUKqeFv-MynxoC-atez4'
+        wks_name = 'sscc'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- DB SSCC --')
+        print(self.df.head())
 
     # --------------------------------------------------
     def upload_formulacion_gtos(self, ejercicio:str = None):
