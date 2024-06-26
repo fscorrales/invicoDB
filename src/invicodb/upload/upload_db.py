@@ -207,11 +207,12 @@ class UploadGoogleSheet():
         print('-- Ejecucion Gastos SIIF --')
         print(self.df.head())
 
+        # CAMBIÉ A OTRO ARCHIVO (Comprobantes Gastos)
         # Comprobantes Gastos SIIF
         self.df = ejecucion_gastos.import_siif_comprobantes()
         self.df['fecha'] = self.df['fecha'].dt.strftime('%d-%m-%Y')
         self.df = self.df.fillna('')
-        spreadsheet_key = '1SRmgep84KGJNj_nKxiwXLe28gVUiIu2Uha4j_C7BzeU'
+        spreadsheet_key = '1Ox1YXlCEQZtHCTefZUSYdd-hpu71Z6poqq0XlPoNf2A'
         wks_name = 'siif_gastos'
         self.gs.to_google_sheets(
             self.df,  
