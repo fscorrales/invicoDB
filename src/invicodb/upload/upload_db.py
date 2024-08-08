@@ -91,7 +91,8 @@ class UploadGoogleSheet():
         ejercicios_varios = range(int(ejercicio_actual)-5, int(ejercicio_actual)+1)
         ejercicios_varios = [str(x) for x in ejercicios_varios]
         self.upload_formulacion_gtos([ejercicio_actual, ejercicio_siguiente])
-        self.upload_ejecucion_gtos(ejercicios_varios)
+        #Incluyo menos años porque es muy lento Google Sheet
+        self.upload_ejecucion_gtos(range(int(ejercicio_actual)-3, int(ejercicio_actual)+1))
         self.upload_ejecucion_pres()
         self.upload_planillometro()
         self.upload_ejecucion_obras_fondos_prov(ejercicios_varios)
