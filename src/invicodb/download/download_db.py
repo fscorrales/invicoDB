@@ -693,14 +693,14 @@ def main():
     #     my_path = os.path.join(output_path, 'Slave/Slave.mdb')
     # )
 
-    # DownloadSIIF(
-    #     path_credentials_file=siif_credentials_path,
-    #     output_path=os.path.join(output_path, 'Reportes SIIF')
-    #     ).download_form_gto_rfp_p605b(['2023', '2024'])
+    DownloadSIIF(
+        path_credentials_file=siif_credentials_path,
+        output_path=os.path.join(output_path, 'Reportes SIIF')
+        ).download_ppto_gtos_fte_rf602(['2024'])
 
-    invico_credentials_path = os.path.join(
-        credentials_path, 'invico_credentials.json'
-    )
+    # invico_credentials_path = os.path.join(
+    #     credentials_path, 'invico_credentials.json'
+    # )
 
     # DownloadSSCC(
     #     path_credentials_file=invico_credentials_path,
@@ -720,19 +720,19 @@ def main():
     #     my_path = os.path.join(output_path, 'R Output/SQLite Files/ICARO.sqlite')
     # )
 
-    sg_credentials_path = os.path.join(
-        credentials_path, 'sgv_credentials.json'
-    )
+    # sg_credentials_path = os.path.join(
+    #     credentials_path, 'sgv_credentials.json'
+    # )
 
     # DownloadSGV(
     #     path_credentials_file=sg_credentials_path,
     #     output_path=os.path.join(output_path, 'Gestión Vivienda GV')
     #     ).download_all_sgv_tables()  
 
-    DownloadSGO(
-        path_credentials_file=sg_credentials_path,
-        output_path=os.path.join(output_path, 'Sistema Gestion Obras')
-        ).download_lotes_certificados(pages='all')  
+    # DownloadSGO(
+    #     path_credentials_file=sg_credentials_path,
+    #     output_path=os.path.join(output_path, 'Sistema Gestion Obras')
+    #     ).download_lotes_certificados(pages='all')  
         
 # --------------------------------------------------
 if __name__ == '__main__':
