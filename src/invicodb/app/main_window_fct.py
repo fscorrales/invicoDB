@@ -258,6 +258,7 @@ class MainWindowFct():
             )
             # Mantenemos abierta la conexión hasta descargar todos los reportes que necesitamos
             siif.download_all = True
+            siif.go_to_reports()
 
             if self.mw.frame_siif.var_rf610.get() == 1:
                 siif.download_ppto_gtos_desc_rf610(ejercicios)

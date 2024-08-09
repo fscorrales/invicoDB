@@ -10,7 +10,6 @@ import datetime as dt
 import json
 import os
 import shutil
-import time
 from dataclasses import dataclass, field
 
 from invicodatpy.sgf import *
@@ -65,6 +64,7 @@ class DownloadSIIF():
             else:
                 ejercicios = [ejercicio_actual]
             self.download_all = True
+            self.go_to_reports()
             # self.download_form_gto_rfp_p605b(str(int_ejercicio + 1))
             self.download_ppto_gtos_desc_rf610(ejercicios)
             self.download_ppto_gtos_fte_rf602(ejercicios)
@@ -100,6 +100,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_ppto_gtos_desc_rf610(self, ejercicios:list):
         print("- Descargando SIIF's rf610 -")
+        if not self.download_all:
+            self.go_to_reports()
         df = ppto_gtos_desc_rf610.PptoGtosDescRf610(siif = self.siif_connection)
         df.download_report(
             os.path.join(
@@ -113,6 +115,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_ppto_gtos_fte_rf602(self, ejercicios:list):
         print("- Descargando SIIF's rf602 -")
+        if not self.download_all:
+            self.go_to_reports()
         df = ppto_gtos_fte_rf602.PptoGtosFteRf602(siif = self.siif_connection)
         df.download_report(
             os.path.join(
@@ -126,6 +130,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_comprobantes_gtos_rcg01_uejp(self, ejercicios:list):
         print("- Descargando SIIF's rcg01_uejp -")
+        if not self.download_all:
+            self.go_to_reports()
         df = comprobantes_gtos_rcg01_uejp.ComprobantesGtosRcg01Uejp(siif = self.siif_connection)
         df.download_report(
             os.path.join(
@@ -139,6 +145,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_comprobantes_gtos_gpo_part_gto_rpa03g(self, ejercicios:list):
         print("- Descargando SIIF's gto_rpa03g -")
+        if not self.download_all:
+            self.go_to_reports()
         df = comprobantes_gtos_gpo_part_gto_rpa03g.ComprobantesGtosGpoPartGtoRpa03g(
             siif = self.siif_connection
         )
@@ -154,6 +162,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_resumen_fdos_rfondo07tp(self, ejercicios:list):
         print("- Descargando SIIF's rfondo07tp -")
+        if not self.download_all:
+            self.go_to_reports()
         df = resumen_fdos_rfondo07tp.ResumenFdosRfondo07tp(
             siif = self.siif_connection
         )
@@ -169,6 +179,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_comprobantes_rec_rci02(self, ejercicios:list):
         print("- Descargando SIIF's rci02 -")
+        if not self.download_all:
+            self.go_to_reports()
         df = comprobantes_rec_rci02.ComprobantesRecRci02(
             siif = self.siif_connection
         )
@@ -184,6 +196,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_ppto_rec_ri102(self, ejercicios:list):
         print("- Descargando SIIF's ri102 -")
+        if not self.download_all:
+            self.go_to_reports()
         df = ppto_rec_ri102.PptoRecRi102(
             siif = self.siif_connection
         )
@@ -199,6 +213,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_form_gto_rfp_p605b(self, ejercicios:list):
         print("- Descargando SIIF's rfp_p605b -")
+        if not self.download_all:
+            self.go_to_reports()
         df = form_gto_rfp_p605b.FormGtoRfpP605b(
             siif = self.siif_connection
         )
@@ -214,6 +230,8 @@ class DownloadSIIF():
     # --------------------------------------------------
     def download_deuda_flotante_rdeu012(self, meses:list):
         print("- Descargando SIIF's rdeu012 -")
+        if not self.download_all:
+            self.go_to_reports()
         df = deuda_flotante_rdeu012.DeudaFlotanteRdeu012(
             siif = self.siif_connection
         )
@@ -231,6 +249,8 @@ class DownloadSIIF():
         self, ejercicios:list, ctas_contables:list = '1112-2-6'
     ):
         print("- Descargando SIIF's rcocc31 -")
+        if not self.download_all:
+            self.go_to_reports()
         df = mayor_contable_rcocc31.MayorContableRcocc31(
             siif = self.siif_connection
         )
@@ -261,9 +281,15 @@ class DownloadSIIF():
                         print(f"File: {file_path} removed")
 
     # --------------------------------------------------
+    def go_to_reports(self):
+        self.siif_connection.connect()
+        self.siif_connection.go_to_reports()
+
+    # --------------------------------------------------
     def quit(self):
-        self.remove_html_files()
         self.siif_connection.disconnect()
+        self.siif_connection.quit()
+        self.remove_html_files()
 
 # --------------------------------------------------
 @dataclass
