@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "invicodb"
+version = "0.1.0"
+description = "Reading, processing and writing script using invicodatr. INVICO's database it's not provide within this repo due to privacy reasons (gitignored)."
+authors = ["Fernando Corrales <fscpython@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.10"
+invicodatpy = {git = "https://github.com/fscorrales/invicodatpy.git"}
+customtkinter = "^5.2.2"
+invicoctrlpy = {git = "https://github.com/fscorrales/invicoctrlpy.git"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

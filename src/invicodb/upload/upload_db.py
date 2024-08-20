@@ -45,13 +45,12 @@ from ..hangling_path import HanglingPath
 class UploadGoogleSheet():
     """Upload DataFrame to Google Sheets
     :param path_credentials_file: json file download from Google
-    :param update_db: Should sqlite files be updated?
     :param input_path: If update_db is True '/Base de Datos' path must be given
     :param output_path: If update_db is True 'Python Output/SQLite Files' must be given
     """
     path_credentials_file:str
     ejercicio:str = str(dt.datetime.now().year)
-    update_db:bool = False
+    # update_db:bool = False
     input_path:str = None
     output_path:str = None
     gs:GoogleSheets = field(init=False, repr=False)
@@ -59,8 +58,8 @@ class UploadGoogleSheet():
 
     # --------------------------------------------------
     def __post_init__(self):
-        if self.input_path == None or self.output_path == None:
-            self.update_db = False
+        # if self.input_path == None or self.output_path == None:
+        #     self.update_db = False
         self.gs = GoogleSheets(path_credentials_file=self.path_credentials_file)
 
     # --------------------------------------------------
@@ -126,7 +125,8 @@ class UploadGoogleSheet():
 
         db = FlujoCaja(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
 
         # DB SSCC
@@ -160,7 +160,8 @@ class UploadGoogleSheet():
 
         ejecucion_gastos = EjecucionGastos(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
 
         # Formulación Gastos SIIF
@@ -193,7 +194,8 @@ class UploadGoogleSheet():
 
         ejecucion_gastos = EjecucionGastos(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
 
         # Ejecucion Gastos SIIF
@@ -233,7 +235,8 @@ class UploadGoogleSheet():
         """
         ejecucion_obras = EjecucionObras(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=self.ejercicio
+            # update_db= self.update_db, 
+            ejercicio=self.ejercicio
         )
 
         # Ejecucion Obras SIIF
@@ -307,7 +310,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         ejecucion_obras = EjecucionObras(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Ejecucion Obras SIIF con Descripcion Unificada
@@ -362,7 +366,8 @@ class UploadGoogleSheet():
 
         ejecucion_obras = EjecucionObras(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
 
         # Planillometro SIIF
@@ -451,7 +456,8 @@ class UploadGoogleSheet():
 
         icaro_vs_siif = IcaroVsSIIF(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
 
         # Control Ejecucion Anual
@@ -519,7 +525,8 @@ class UploadGoogleSheet():
         """
         icaro_vs_siif = IcaroVsSIIF(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=None
+            # update_db= self.update_db, 
+            ejercicio=None
         )
 
         # ICARO Carga
@@ -565,7 +572,8 @@ class UploadGoogleSheet():
 
         control_recursos = ControlRecursos(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
         # Control Recursos por Mes, Grupo y Cta Cte
         self.df = control_recursos.control_recursos()
@@ -668,7 +676,8 @@ class UploadGoogleSheet():
 
         flujo_caja = FlujoCaja(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio_metodo
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
         )
         # Flujo de Caja desde SSCC INVICO
         self.df = flujo_caja.import_banco_invico()
@@ -700,7 +709,8 @@ class UploadGoogleSheet():
 
         control_haberes = ControlHaberes(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
         # Control Haberes Mensual
         self.df = control_haberes.control_cruzado()
@@ -779,7 +789,8 @@ class UploadGoogleSheet():
 
         control_retenciones = ControlRetenciones(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Control Cruzado Icaro VS SSCC
@@ -901,7 +912,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         fondos_perm = FondosPermCajasChicas(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Comprobantes SIIF Fondos Permanentes y Cajas Chicas
@@ -933,7 +945,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         control_obras = ControlObras(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db,
+            ejercicio=ejercicio
         )
 
         # Control Obras por Ejercicio, Mes, Cta. Cte. y CUIT
@@ -961,7 +974,7 @@ class UploadGoogleSheet():
 
         listado_obras = ListadoObras(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db
+            # update_db= self.update_db
         )
 
         # Listado de Obras Icaro con Codigo Obras SGO
@@ -1017,7 +1030,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         control_escribanos = ControlEscribanos(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Control Escribanos SIIF vs SGF
@@ -1104,7 +1118,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         control_honorarios = ControlHonorarios(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Control Honorarios SIIF vs Slave
@@ -1189,7 +1204,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         control_debitos = ControlDebitosBancarios(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Control Debitos Bancarios SIIF vs SSCC
@@ -1249,7 +1265,8 @@ class UploadGoogleSheet():
             ejercicio = self.ejercicio
         aporte_empresario = ControlAporteEmpresario(
             input_path=self.input_path, db_path=self.output_path,
-            update_db= self.update_db, ejercicio=ejercicio
+            # update_db= self.update_db, 
+            ejercicio=ejercicio
         )
 
         # Control INVICO 3% Recursos vs Retenciones
@@ -1356,7 +1373,7 @@ def main():
     upload = UploadGoogleSheet(
         path_credentials_file=google_credentials_path,
         ejercicio='2023',
-        update_db=False,
+        # update_db=False,
         input_path=input_path,
         output_path=output_path
     )

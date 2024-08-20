@@ -548,7 +548,7 @@ class MainWindowFct():
         upload = UploadGoogleSheet(
             path_credentials_file=google_credentials_path,
             ejercicio='2023',
-            update_db=False,
+            # update_db=False,
             input_path=input_path,
             output_path=output_path
         )
