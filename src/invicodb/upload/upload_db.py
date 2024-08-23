@@ -89,6 +89,7 @@ class UploadGoogleSheet():
         ejercicio_siguiente = str(dt.datetime.now().year + 1)
         ejercicios_varios = range(int(ejercicio_actual)-5, int(ejercicio_actual)+1)
         ejercicios_varios = [str(x) for x in ejercicios_varios]
+        self.upload_formulacion_presupuesto(ejercicio_actual)
         self.upload_formulacion_gtos([ejercicio_actual, ejercicio_siguiente])
         #Incluyo menos años porque es muy lento Google Sheet
         self.upload_ejecucion_gtos(range(int(ejercicio_actual)-3, int(ejercicio_actual)+1))
@@ -141,6 +142,58 @@ class UploadGoogleSheet():
             wks_name = wks_name
         )
         print('-- DB SSCC --')
+        print(self.df.head())
+
+    # --------------------------------------------------
+    def upload_formulacion_presupuesto(self, ejercicio:str = None):
+        """Update and Upload Formulacion Presupuesto
+            - SIIF rf602
+            - SIIF rf610
+            - ICARO
+        """
+        if ejercicio == None:
+            ejercicio_metodo = self.ejercicio
+        else:
+            ejercicio_metodo = ejercicio
+
+        ejecucion_obras = EjecucionObras(
+            input_path=self.input_path, db_path=self.output_path,
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
+        )
+
+        # Formulación Gastos SIIF
+        self.df = ejecucion_obras.reporte_planillometro_contabilidad(
+            ultimos_ejercicios = '2',
+            es_desc_siif = False
+        )
+        self.df['ejercicio'] = self.df['ejercicio'].astype(int)
+        spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
+        wks_name = 'planillometro_contabilidad'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Planillometro Contabilidad para Formulación --')
+        print(self.df.head())
+
+        ejecucion_gastos = EjecucionGastos(
+            input_path=self.input_path, db_path=self.output_path,
+            # update_db= self.update_db, 
+            ejercicio=ejercicio_metodo
+        )
+
+        # Ejecucion Gastos SIIF
+        self.df = ejecucion_gastos.import_siif_gtos_desc()
+        spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
+        wks_name = 'siif_ejec_gastos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Ejecucion Gastos SIIF --')
         print(self.df.head())
 
     # --------------------------------------------------

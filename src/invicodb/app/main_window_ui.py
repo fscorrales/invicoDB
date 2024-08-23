@@ -51,6 +51,7 @@ class MainWindowUI():
             'Control 3% INVICO',
             'Ejecución Gastos',
             'Planillómetro y Ejecución Obras',
+            'Formulación Presupuestaria',
             'Fondos Permanentes y Cajas Chicas',
             'Control Icaro',
             'Control Obras',
@@ -258,6 +259,7 @@ class MainWindowUI():
     ):
 
         values_and_vars = {
+            'Formulación Presupuestaria':'var_form_gastos',
             'Ejecución Anual Gastos':'var_ejec_gastos',
             'Comprobantes Gastos':'var_comprobantes_gastos',
             'Planillómetro Obras':'var_planillometro_obras',

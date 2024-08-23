@@ -111,6 +111,12 @@ class MainWindowFct():
             self.mw.frame_gastos.var_ejec_obras.set(1)
             self.mw.frame_gastos.var_ejec_fdos_provinciales.set(1)
             self.mw.frame_gastos.var_ejec_mod_basicos.set(1)
+        elif choice == "Formulación Presupuestaria":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rf610.set(1)
+            self.mw.frame_siif.var_rf602.set(1)
+            self.mw.frame_sist_propios.var_icaro.set(1)
+            self.mw.frame_gastos.var_form_gastos.set(1)
         elif choice == "Fondos Permanentes y Cajas Chicas":
             self.unselectAllCheakBoxes()
             self.mw.frame_siif.var_gto_rpa03g.set(1)
@@ -569,6 +575,8 @@ class MainWindowFct():
         if len(gastos_list) > 0:
             #self.upload_planillometro()
             #self.upload_formulacion_gtos()
+            if self.mw.frame_gastos.var_form_gastos.get() == 1:
+                upload.upload_formulacion_presupuesto(ejercicio_actual)
             if (self.mw.frame_gastos.var_ejec_gastos.get() == 1 or 
                 self.mw.frame_gastos.var_comprobantes_gastos.get() == 1):
                 upload.upload_ejecucion_gtos(ejercicios_varios)
