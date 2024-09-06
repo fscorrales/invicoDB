@@ -27,7 +27,7 @@ from invicoctrlpy.gastos.control_retenciones.control_retenciones import \
     ControlRetenciones
 from invicoctrlpy.gastos.ejecucion_gastos.ejecucion_gastos import \
     EjecucionGastos
-from invicoctrlpy.gastos.ejecucion_obras.ejecucion_obras import EjecucionObras
+from invicoctrlpy.gastos.ejecucion_obras import EjecucionObras
 from invicoctrlpy.gastos.fondos_perm_cajas_chicas.fondos_perm_cajas_chicas import \
     FondosPermCajasChicas
 from invicoctrlpy.icaro.icaro_vs_siif.icaro_vs_siif import IcaroVsSIIF
@@ -165,7 +165,9 @@ class UploadGoogleSheet():
         # Formulación Gastos SIIF
         self.df = ejecucion_obras.reporte_planillometro_contabilidad(
             ultimos_ejercicios = '2',
-            es_desc_siif = False
+            es_desc_siif = False,
+            date_up_to = dt.date(int(ejercicio_metodo), 8, 31),
+            include_pa6 = True
         )
         self.df['ejercicio'] = self.df['ejercicio'].astype(int)
         spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
