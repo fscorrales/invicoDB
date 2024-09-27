@@ -2,9 +2,15 @@ import datetime as dt
 import os
 from dataclasses import dataclass
 
-import customtkinter as ctk
-
-from ..download.download_db import *
+from ..download.download_db import (
+    DownloadSGF,
+    DownloadSGO,
+    DownloadSGV,
+    DownloadSIIF,
+    DownloadSSCC,
+    CopyIcaro,
+    CopySlave,
+)
 from ..hangling_path import HanglingPath
 from ..update.update_db import *
 from ..upload.upload_db import UploadGoogleSheet
@@ -115,6 +121,8 @@ class MainWindowFct():
             self.unselectAllCheakBoxes()
             self.mw.frame_siif.var_rf610.set(1)
             self.mw.frame_siif.var_rf602.set(1)
+            self.mw.frame_siif.var_rfp_p605b.set(1)
+            self.mw.frame_siif.var_ri102.set(1)
             self.mw.frame_sist_propios.var_icaro.set(1)
             self.mw.frame_gastos.var_form_gastos.set(1)
         elif choice == "Fondos Permanentes y Cajas Chicas":
@@ -298,7 +306,9 @@ class MainWindowFct():
                     siif.download_form_gto_rfp_p605b(ejercicios)
                 elif last_ejercicio == dt.datetime.now().year:
                     if dt.datetime.now().month >= 9:
-                        siif.download_form_gto_rfp_p605b(ejercicios)
+                        ejercicios_aux = ejercicios.copy()
+                        ejercicios_aux.append(str(last_ejercicio + 1))
+                        siif.download_form_gto_rfp_p605b(ejercicios_aux)
                 else:
                     ejercicios_aux = ejercicios.copy()
                     ejercicios_aux = ejercicios_aux[:-1]
@@ -553,7 +563,7 @@ class MainWindowFct():
 
         upload = UploadGoogleSheet(
             path_credentials_file=google_credentials_path,
-            ejercicio='2023',
+            ejercicio=ejercicio_actual,
             # update_db=False,
             input_path=input_path,
             output_path=output_path

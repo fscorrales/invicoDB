@@ -12,7 +12,7 @@ import time
 from dataclasses import dataclass, field
 
 import pandas as pd
-from invicoctrlpy.utils.import_dataframe import ImportDataFrame
+
 from invicoctrlpy.banco.flujo_caja import FlujoCaja
 from invicoctrlpy.gastos.control_debitos_bancarios.control_debitos_bancarios import \
     ControlDebitosBancarios
@@ -119,7 +119,7 @@ class UploadGoogleSheet():
             - SSCC
             - SSCC Ctas Ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -149,9 +149,11 @@ class UploadGoogleSheet():
         """Update and Upload Formulacion Presupuesto
             - SIIF rf602
             - SIIF rf610
+            - SIIF ri102
+            - SIIF rfp_p605b
             - ICARO
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -166,8 +168,9 @@ class UploadGoogleSheet():
         self.df = ejecucion_obras.reporte_planillometro_contabilidad(
             ultimos_ejercicios = '2',
             es_desc_siif = False,
+            incluir_desc_subprog = True,
             date_up_to = dt.date(int(ejercicio_metodo), 8, 31),
-            include_pa6 = True
+            include_pa6 = True,
         )
         self.df['ejercicio'] = self.df['ejercicio'].astype(int)
         spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
@@ -180,14 +183,23 @@ class UploadGoogleSheet():
         print('-- Planillometro Contabilidad para Formulación --')
         print(self.df.head())
 
+        
+        ejercicios_varios = range(
+            int(ejercicio_metodo) - 2, 
+            int(ejercicio_metodo) + 2 #Para incluir el año siguiente (Formulación)
+        )
+        ejercicios_varios = [str(x) for x in ejercicios_varios]
+
+        # Ejecucion Gastos SIIF
         ejecucion_gastos = EjecucionGastos(
             input_path=self.input_path, db_path=self.output_path,
             # update_db= self.update_db, 
-            ejercicio=ejercicio_metodo
+            ejercicio=ejercicios_varios
         )
 
-        # Ejecucion Gastos SIIF
         self.df = ejecucion_gastos.import_siif_gtos_desc()
+        self.df.loc[self.df['programa'] == 11, 'desc_prog'] = '11 - CONSTR. DE VIVIENDAS C/EQUIPAMIENTO COMUNITARIOS'
+        self.df['fuente'] = self.df['fuente'].astype(int)
         spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
         wks_name = 'siif_ejec_gastos'
         self.gs.to_google_sheets(
@@ -197,6 +209,39 @@ class UploadGoogleSheet():
         )
         print('-- Ejecucion Gastos SIIF --')
         print(self.df.head())
+
+        # Formulación Gastos SIIF
+        self.df = ejecucion_gastos.import_siif_rfp_p605b()
+        spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
+        wks_name = 'siif_carga_form_gastos'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Formulación Gastos SIIF --')
+        print(self.df.head())
+
+
+        # SIIF Recursos Anual por Código
+        control_recursos = ControlRecursos(
+            input_path=self.input_path, db_path=self.output_path,
+            # update_db= self.update_db, 
+            ejercicio=ejercicios_varios
+        )
+
+        self.df = control_recursos.import_siif_ri102()
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1hJyBOkA8sj5otGjYGVOzYViqSpmv_b4L8dXNju_GJ5Q'
+        wks_name = 'siif_recursos_cod'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- SIIF Recursos Anual por Código --')
+        print(self.df.head())
+
 
     # --------------------------------------------------
     def upload_formulacion_gtos(self, ejercicio:str = None):
@@ -208,7 +253,7 @@ class UploadGoogleSheet():
             - SIIF gto_rpa03g
             - SIIF rcg01_uejp
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -242,7 +287,7 @@ class UploadGoogleSheet():
             - SIIF rfp_p605b (no obligatorio)
             - SSCC Ctas Ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -361,7 +406,7 @@ class UploadGoogleSheet():
             - SIIF rf610
             - Icaro
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         ejecucion_obras = EjecucionObras(
             input_path=self.input_path, db_path=self.output_path,
@@ -414,7 +459,7 @@ class UploadGoogleSheet():
             - SIIF rf610
             - Icaro
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -504,7 +549,7 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
         """
 
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -620,7 +665,7 @@ class UploadGoogleSheet():
             - SSCC Consulta General de Movimiento
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -724,7 +769,7 @@ class UploadGoogleSheet():
             - SSCC Consulta General de Movimiento
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio_metodo = self.ejercicio
         else:
             ejercicio_metodo = ejercicio
@@ -759,7 +804,7 @@ class UploadGoogleSheet():
             - SSCC Resumen General de Movimientos
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
 
         control_haberes = ControlHaberes(
@@ -839,7 +884,7 @@ class UploadGoogleSheet():
                 2122-1-2 Retenciones
                 1112-2-6 Banco)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
 
         control_retenciones = ControlRetenciones(
@@ -963,7 +1008,7 @@ class UploadGoogleSheet():
             - SIIF rog01 (solo una vez)
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         fondos_perm = FondosPermCajasChicas(
             input_path=self.input_path, db_path=self.output_path,
@@ -996,7 +1041,7 @@ class UploadGoogleSheet():
             - SSCC Resumen General de Movimientos
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         control_obras = ControlObras(
             input_path=self.input_path, db_path=self.output_path,
@@ -1081,7 +1126,7 @@ class UploadGoogleSheet():
             - SSCC ctas_ctes (manual data)
             - SIIF rcocc31 (2113-2-9 Escribanos)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         control_escribanos = ControlEscribanos(
             input_path=self.input_path, db_path=self.output_path,
@@ -1169,7 +1214,7 @@ class UploadGoogleSheet():
             - SSCC Resumen General de Movimientos (para agregar dep. emb. x alim. 130832-05)
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         control_honorarios = ControlHonorarios(
             input_path=self.input_path, db_path=self.output_path,
@@ -1255,7 +1300,7 @@ class UploadGoogleSheet():
             - SSCC Movimientos Generales
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         control_debitos = ControlDebitosBancarios(
             input_path=self.input_path, db_path=self.output_path,
@@ -1316,7 +1361,7 @@ class UploadGoogleSheet():
             )
             - SSCC ctas_ctes (manual data)
         """
-        if ejercicio == None:
+        if ejercicio is None:
             ejercicio = self.ejercicio
         aporte_empresario = ControlAporteEmpresario(
             input_path=self.input_path, db_path=self.output_path,
@@ -1404,7 +1449,7 @@ def main():
     """Let's try it"""
     args = get_args()
 
-    if args.credentials == None:
+    if args.credentials is None:
         google_credentials_path = HanglingPath().get_invicodb_path()
         google_credentials_path = os.path.join(
             google_credentials_path, 'upload'
@@ -1415,12 +1460,12 @@ def main():
     else:
         google_credentials_path = args.credentials
 
-    if args.input_path == None:
+    if args.input_path is None:
         input_path = HanglingPath().get_update_path_input()
     else:
         input_path = args.input_path
 
-    if args.output_path == None:
+    if args.output_path is None:
         output_path = HanglingPath().get_db_path()
     else:
         output_path = args.output_path
