@@ -21,8 +21,21 @@ from dataclasses import dataclass, field
 from invicodatpy.sgf import *
 from invicodatpy.sgo import *
 from invicodatpy.sgv import *
-from invicodatpy.siif import *
 from invicodatpy.sscc import *
+from invicodatpy.siif import (
+    ComprobantesGtosGpoPartGtoRpa03g,
+    ComprobantesGtosRcg01Uejp,
+    ComprobantesRecRci02,
+    ConnectSIIF,
+    DeudaFlotanteRdeu012,
+    FormGtoRfpP605b,
+    MayorContableRcocc31,
+    PptoGtosDescRf610,
+    PptoGtosFteRf602,
+    PptoRecRi102,
+    # ResumenContableCtaRvicon03,
+    ResumenFdosRfondo07tp,
+)
 from selenium import webdriver
 
 from ..hangling_path import HanglingPath
@@ -30,7 +43,7 @@ from ..hangling_path import HanglingPath
 
 # --------------------------------------------------
 @dataclass
-class DownloadSIIF:
+class DownloadSIIF():
     """Download SIIF' reports
     :param path_credentials_file: json file with SIIF' credentials
     :param input_path: If update_db is True '/Base de Datos' path must be given
@@ -40,7 +53,6 @@ class DownloadSIIF:
     path_credentials_file: str
     output_path: str
     download_all: bool = field(init=False, repr=False, default=False)
-    siif_connection: webdriver = field(init=False, repr=False)
 
     # --------------------------------------------------
     def __post_init__(self):
@@ -49,7 +61,8 @@ class DownloadSIIF:
         if os.path.isfile(self.path_credentials_file):
             with open(self.path_credentials_file) as json_file:
                 data_json = json.load(json_file)
-                self.siif_connection = connect_siif.ConnectSIIF(
+                self.siif = ConnectSIIF
+                self.siif.connect(
                     data_json["username"], data_json["password"]
                 )
             json_file.close()
@@ -109,63 +122,59 @@ class DownloadSIIF:
             # self.download_detalle_partidas_rog01()
         except Exception as e:
             print(f"Ocurrió un error: {e}, {type(e)}")
-            self.siif_connection.disconnect()
-        finally:
-            self.quit()
+            self.siif.disconnect()
+        # finally:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_ppto_gtos_desc_rf610(self, ejercicios: list):
         print("- Descargando SIIF's rf610 -")
         if not self.download_all:
             self.go_to_reports()
-        df = ppto_gtos_desc_rf610.PptoGtosDescRf610(siif=self.siif_connection)
+        df = PptoGtosDescRf610()
         df.download_report(
             os.path.join(
                 self.output_path, "Ejecucion Presupuestaria con Descripcion (rf610)"
             ),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_ppto_gtos_fte_rf602(self, ejercicios: list):
         print("- Descargando SIIF's rf602 -")
         if not self.download_all:
             self.go_to_reports()
-        df = ppto_gtos_fte_rf602.PptoGtosFteRf602(siif=self.siif_connection)
+        df = PptoGtosFteRf602()
         df.download_report(
             os.path.join(
                 self.output_path, "Ejecucion Presupuestaria con Fuente (rf602)"
             ),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_comprobantes_gtos_rcg01_uejp(self, ejercicios: list):
         print("- Descargando SIIF's rcg01_uejp -")
         if not self.download_all:
             self.go_to_reports()
-        df = comprobantes_gtos_rcg01_uejp.ComprobantesGtosRcg01Uejp(
-            siif=self.siif_connection
-        )
+        df = ComprobantesGtosRcg01Uejp()
         df.download_report(
             os.path.join(self.output_path, "Comprobantes de Gastos (rcg01_uejp)"),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_comprobantes_gtos_gpo_part_gto_rpa03g(self, ejercicios: list):
         print("- Descargando SIIF's gto_rpa03g -")
         if not self.download_all:
             self.go_to_reports()
-        df = comprobantes_gtos_gpo_part_gto_rpa03g.ComprobantesGtosGpoPartGtoRpa03g(
-            siif=self.siif_connection
-        )
+        df = ComprobantesGtosGpoPartGtoRpa03g()
         df.download_report(
             os.path.join(
                 self.output_path,
@@ -173,15 +182,15 @@ class DownloadSIIF:
             ),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_resumen_fdos_rfondo07tp(self, ejercicios: list):
         print("- Descargando SIIF's rfondo07tp -")
         if not self.download_all:
             self.go_to_reports()
-        df = resumen_fdos_rfondo07tp.ResumenFdosRfondo07tp(siif=self.siif_connection)
+        df = ResumenFdosRfondo07tp()
         df.download_report(
             os.path.join(
                 self.output_path,
@@ -189,43 +198,43 @@ class DownloadSIIF:
             ),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_comprobantes_rec_rci02(self, ejercicios: list):
         print("- Descargando SIIF's rci02 -")
         if not self.download_all:
             self.go_to_reports()
-        df = comprobantes_rec_rci02.ComprobantesRecRci02(siif=self.siif_connection)
+        df = ComprobantesRecRci02()
         df.download_report(
             os.path.join(self.output_path, "Comprobantes de Recursos (rci02)"),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_ppto_rec_ri102(self, ejercicios: list):
         print("- Descargando SIIF's ri102 -")
         if not self.download_all:
             self.go_to_reports()
-        df = ppto_rec_ri102.PptoRecRi102(siif=self.siif_connection)
+        df = PptoRecRi102()
         df.download_report(
             os.path.join(
                 self.output_path, "Ejecucion Presupuestaria Recursos por Codigo (ri102)"
             ),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_form_gto_rfp_p605b(self, ejercicios: list):
         print("- Descargando SIIF's rfp_p605b -")
         if not self.download_all:
             self.go_to_reports()
-        df = form_gto_rfp_p605b.FormGtoRfpP605b(siif=self.siif_connection)
+        df = FormGtoRfpP605b()
         df.download_report(
             os.path.join(
                 self.output_path,
@@ -233,20 +242,20 @@ class DownloadSIIF:
             ),
             ejercicios=ejercicios,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_deuda_flotante_rdeu012(self, meses: list):
         print("- Descargando SIIF's rdeu012 -")
         if not self.download_all:
             self.go_to_reports()
-        df = deuda_flotante_rdeu012.DeudaFlotanteRdeu012(siif=self.siif_connection)
+        df = DeudaFlotanteRdeu012()
         df.download_report(
             os.path.join(self.output_path, "Deuda Flotante (rdeu)"), meses=meses
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def download_mayor_contable_rcocc31(
@@ -255,14 +264,14 @@ class DownloadSIIF:
         print("- Descargando SIIF's rcocc31 -")
         if not self.download_all:
             self.go_to_reports()
-        df = mayor_contable_rcocc31.MayorContableRcocc31(siif=self.siif_connection)
+        df = MayorContableRcocc31()
         df.download_report(
             os.path.join(self.output_path, "Movimientos Contables (rcocc31)"),
             ejercicios=ejercicios,
             ctas_contables=ctas_contables,
         )
-        if not self.download_all:
-            self.quit()
+        # if not self.download_all:
+        #     self.quit()
 
     # --------------------------------------------------
     def remove_html_files(self):
@@ -282,13 +291,13 @@ class DownloadSIIF:
 
     # --------------------------------------------------
     def go_to_reports(self):
-        self.siif_connection.connect()
-        self.siif_connection.go_to_reports()
+        # self.siif.connect()
+        self.siif.go_to_reports()
 
     # --------------------------------------------------
     def quit(self):
-        self.siif_connection.disconnect()
-        self.siif_connection.quit()
+        self.siif.disconnect()
+        self.siif.quit()
         self.remove_html_files()
 
 
@@ -741,7 +750,7 @@ def main():
     DownloadSIIF(
         path_credentials_file=siif_credentials_path,
         output_path=os.path.join(output_path, "Reportes SIIF"),
-    ).download_ppto_gtos_fte_rf602(["2024"])
+    ).download_ppto_gtos_desc_rf610(['2024'])
 
     # invico_credentials_path = os.path.join(
     #     credentials_path, 'invico_credentials.json'
