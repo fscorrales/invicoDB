@@ -562,7 +562,9 @@ class UploadGoogleSheet():
 
         # Control Ejecucion Anual
         self.df = icaro_vs_siif.control_ejecucion_anual()
-        self.df = self.df.fillna(0)
+        fields_to_update = ['ejecucion_siif', 'ejecucion_icaro', 'diferencia']
+        self.df[fields_to_update] = self.df[fields_to_update].fillna(0)
+        self.df = self.df.fillna('')
         spreadsheet_key = '1KKeeoop_v_Nf21s7eFp4sS6SmpxRZQ9DPa1A5wVqnZ0'
         wks_name = 'control_ejecucion_anual_db'
         self.gs.to_google_sheets(
