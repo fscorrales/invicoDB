@@ -3,18 +3,26 @@ import os
 from dataclasses import dataclass
 
 from ..download.download_db import (
+    CopyIcaro,
+    CopySlave,
     DownloadSGF,
     DownloadSGO,
     DownloadSGV,
     DownloadSIIF,
     DownloadSSCC,
-    CopyIcaro,
-    CopySlave,
 )
 from ..hangling_path import HanglingPath
-from ..update.update_db import *
+from ..update.update_db import (
+    UpdateIcaro,
+    UpdateSGF,
+    UpdateSGO,
+    UpdateSGV,
+    UpdateSIIF,
+    UpdateSlave,
+    UpdateSSCC,
+)
 from ..upload.upload_db import UploadGoogleSheet
-from .default_widgets_setup import *
+# from .default_widgets_setup import *
 from .main_window_ui import MainWindowUI
 
 
@@ -197,6 +205,9 @@ class MainWindowFct():
             self.mw.frame_sscc.var_banco_invico.set(1)
             self.mw.frame_sscc.var_ctas_ctes.set(1)
             self.mw.frame_gastos.var_ctrl_debitos_bancarios.set(1)
+        elif choice == "Control Deuda Flotante":
+            self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rcocc31_complete.set(1)
 
     def unselectAllCheakBoxes(self):
         self.mw.frame_siif.var_switch_all.set(0)
@@ -300,6 +311,8 @@ class MainWindowFct():
                 siif.download_mayor_contable_rcocc31(
                     ejercicios, ctas_contables=ctas_contables
                 )
+            if self.mw.frame_siif.var_rcocc31_complete.get() == 1:
+                siif.download_complete_mayor_contable_rcocc31(ejercicios)
             if self.mw.frame_siif.var_rfp_p605b.get() == 1:
                 last_ejercicio = int(ejercicios[-1])
                 if last_ejercicio < dt.datetime.now().year:
@@ -447,7 +460,8 @@ class MainWindowFct():
                 siif.update_ppto_rec_ri102()  
             if self.mw.frame_siif.var_rci02.get() == 1:
                 siif.update_comprobantes_rec_rci02()  
-            if self.mw.frame_siif.var_rcocc31.get() == 1:
+            if (self.mw.frame_siif.var_rcocc31.get() == 1 or 
+                self.mw.frame_siif.var_rcocc31_complete.get() == 1):
                 siif.update_mayor_contable_rcocc31()
             if self.mw.frame_siif.var_rfp_p605b.get() == 1:
                 siif.update_form_gto_rfp_p605b()
@@ -547,7 +561,7 @@ class MainWindowFct():
 
         ejercicio_actual = str(dt.datetime.now().year)
         ejercicio_anterior = str(dt.datetime.now().year - 1)
-        ejercicio_siguiente = str(dt.datetime.now().year + 1)
+        # ejercicio_siguiente = str(dt.datetime.now().year + 1)
         ejercicios_varios = range(int(ejercicio_actual)-5, int(ejercicio_actual)+1)
         ejercicios_varios = [str(x) for x in ejercicios_varios]
 

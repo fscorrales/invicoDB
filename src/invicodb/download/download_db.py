@@ -35,6 +35,7 @@ from invicodatpy.siif import (
     PptoRecRi102,
     # ResumenContableCtaRvicon03,
     ResumenFdosRfondo07tp,
+    JoinResumenMayorContable,
 )
 from selenium import webdriver
 
@@ -269,6 +270,21 @@ class DownloadSIIF():
             os.path.join(self.output_path, "Movimientos Contables (rcocc31)"),
             ejercicios=ejercicios,
             ctas_contables=ctas_contables,
+        )
+        # if not self.download_all:
+        #     self.quit()
+
+    # --------------------------------------------------
+    def download_complete_mayor_contable_rcocc31(
+        self, ejercicios: list
+    ):
+        print("- Descargando LIBRO DIARIO SIIF's rvicon01 + rcocc31 -")
+        if not self.download_all:
+            self.go_to_reports()
+        df = JoinResumenMayorContable()
+        df.download_and_unite_reports(
+            os.path.join(self.output_path, "Movimientos Contables (rcocc31)"),
+            ejercicios=ejercicios
         )
         # if not self.download_all:
         #     self.quit()

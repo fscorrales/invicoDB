@@ -3,7 +3,14 @@ from dataclasses import dataclass
 
 import customtkinter as ctk
 
-from .default_widgets_setup import *
+from .default_widgets_setup import (
+    DefaultButton,
+    DefaultFrame,
+    DefaultOptionMenu,
+    DefaultSwitch,
+    DefaultTabView,
+    MyScrollableCheckboxFrame,
+)
 
 
 @dataclass
@@ -61,6 +68,7 @@ class MainWindowUI():
             'Control Escribanos',
             'Control Retenciones',
             'Control Débitos Bancarios',
+            'Control Deuda Flotante',
         ]
         var_option_process_type = ctk.StringVar(value="Personalizado")
         self.optional_process_type = DefaultOptionMenu(
@@ -126,6 +134,7 @@ class MainWindowUI():
             'Presupuesto Recursos (ri102)':'var_ri102',
             'Comprobantes Recursos (rci02)':'var_rci02',
             'Mayor Contable (rcocc31)':'var_rcocc31',
+            'Mayor Contable Completo (rcocc31)':'var_rcocc31_complete',
             'Formulación Gastos (rfp_p605b)':'var_rfp_p605b',
         }
         self.frame_siif = MyScrollableCheckboxFrame(
