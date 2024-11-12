@@ -12,6 +12,7 @@ import time
 from dataclasses import dataclass, field
 
 import pandas as pd
+import numpy as np
 
 from invicoctrlpy.banco.flujo_caja import FlujoCaja
 from invicoctrlpy.gastos.control_debitos_bancarios.control_debitos_bancarios import \
@@ -35,6 +36,7 @@ from invicoctrlpy.recursos.aporte_empresario.aporte_empresario import \
     ControlAporteEmpresario
 from invicoctrlpy.recursos.control_recursos.control_recursos import \
     ControlRecursos
+from invicoctrlpy.contabilidad.deuda_flotante import rdeu012_with_accounting
 from invicodatpy.utils.google_sheets import GoogleSheets
 
 from ..hangling_path import HanglingPath
@@ -110,6 +112,7 @@ class UploadGoogleSheet():
         self.upload_control_honorarios([ejercicio_actual, ejercicio_anterior])
         self.upload_control_debitos_bancarios([ejercicio_actual, ejercicio_anterior])
         self.upload_control_3_porciento_invico([ejercicio_actual, ejercicio_anterior])
+        self.upload_control_contable_deuda_flotante()
 
     # NO IMPLEMENTADO AÚN
     # --------------------------------------------------
@@ -1413,6 +1416,69 @@ class UploadGoogleSheet():
         print('-- Control SIIF Retención 337 COMPLETO --')
         print(self.df.head())
 
+
+    # --------------------------------------------------
+    def upload_control_contable_deuda_flotante(self, ejercicio:list = None):
+        """Update and Upload Control INVICO 3%
+        Update requires:
+            - SIIF rcocc31 (2000)
+            - SIIF rdeu012
+            - SSCC ctas_ctes (manual data)
+        """
+        if ejercicio is None:
+            ejercicio = self.ejercicio
+        ejercicio = list(set(ejercicio + ['2010', '2011', '2016', '2017', '2018']))
+        ctrl_rdeu = rdeu012_with_accounting(
+            db_path=self.output_path,
+            ejercicios=ejercicio
+        )
+
+        # rdeu012
+        self.df = ctrl_rdeu.rdeu012
+        self.df = self.df.fillna('')
+        date_cols = ['fecha', 'fecha_aprobado', 'fecha_desde', 'fecha_hasta']
+        self.df[date_cols] = self.df[date_cols].apply(lambda x: x.dt.strftime('%d-%m-%Y'))
+        spreadsheet_key = '1rYBKQhzz_5iahkFPXI5FtOwjqbJYLpNA_OMEfNR81us'
+        wks_name = 'siif_rdeu'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Deuda Flotante (rdeu) --')
+        print(self.df.head())
+
+        # rcocc31
+        self.df = ctrl_rdeu.rcocc31
+        date_cols = ['fecha', 'fecha_aprobado']
+        self.df[date_cols] = self.df[date_cols].apply(lambda x: x.dt.strftime('%d-%m-%Y'))
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1rYBKQhzz_5iahkFPXI5FtOwjqbJYLpNA_OMEfNR81us'
+        wks_name = 'siif_rcocc31'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Mayor Contable del Pasivo (rcocc31) --')
+        print(self.df.head())
+
+        # rdeu + rccoc31
+        self.df = ctrl_rdeu.rdeu_cta_contable
+        date_cols = ['fecha', 'fecha_aprobado']
+        self.df[date_cols] = self.df[date_cols].apply(lambda x: x.dt.strftime('%d-%m-%Y'))
+        fields_to_update = ['creditos', 'debitos', 'saldo_contable']
+        self.df[fields_to_update] = self.df[fields_to_update].fillna(0)
+        self.df = self.df.fillna('')
+        spreadsheet_key = '1rYBKQhzz_5iahkFPXI5FtOwjqbJYLpNA_OMEfNR81us'
+        wks_name = 'siif_rdeu_cta_contable'
+        self.gs.to_google_sheets(
+            self.df,  
+            spreadsheet_key = spreadsheet_key,
+            wks_name = wks_name
+        )
+        print('-- Deuda Flotante con Cuenta Contable --')
+        print(self.df.head())
 
 # --------------------------------------------------
 def get_args():

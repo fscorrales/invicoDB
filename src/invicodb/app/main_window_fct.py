@@ -633,4 +633,10 @@ class MainWindowFct():
             if self.mw.frame_gastos.var_ctrl_debitos_bancarios.get() == 1:
                 upload.upload_control_debitos_bancarios([ejercicio_actual, ejercicio_anterior])
 
+        contabilidad_list = self.mw.frame_contabilidad.getText()
+        if len(contabilidad_list) > 0:
+
+            if self.mw.frame_contabilidad.var_deuda_flotante.get() == 1:
+                upload.upload_control_contable_deuda_flotante([ejercicio_actual, ejercicio_anterior])
+
         print('***Finalizando subida de datos a Google Sheet***')
