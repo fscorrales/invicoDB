@@ -208,6 +208,9 @@ class MainWindowFct():
         elif choice == "Control Deuda Flotante":
             self.unselectAllCheakBoxes()
             self.mw.frame_siif.var_rcocc31_complete.set(1)
+            self.mw.frame_siif.var_rdeu012.set(1)
+            self.mw.frame_sscc.var_ctas_ctes.set(1)
+            self.mw.frame_contabilidad.var_deuda_flotante.set(1)
 
     def unselectAllCheakBoxes(self):
         self.mw.frame_siif.var_switch_all.set(0)

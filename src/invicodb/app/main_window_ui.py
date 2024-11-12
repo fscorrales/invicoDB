@@ -36,6 +36,7 @@ class MainWindowUI():
         self.setupProcessFrame(row=2, column=0, columnspan=3)
         self.setupRecursosFrame(row=0, column=0)
         self.setupGastosFrame(row=0, column=1)
+        self.setupContabilidadFrame(row=0, column=2)
 
     def setupInitialParametersFrame(
         self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
@@ -294,6 +295,23 @@ class MainWindowUI():
             row=row, column=column, rowspan=rowspan, columnspan=columnspan,
             padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
         )
+
+    def setupContabilidadFrame(
+        self, row:int = 0, column:int = 0, rowspan:int = 1, columnspan:int = 1
+    ):
+
+        values_and_vars = {
+            'Control Deuda Flotante':'var_deuda_flotante',
+        }
+        self.frame_contabilidad = MyScrollableCheckboxFrame(
+            self.tab_upload, title="Contabilidad", values_and_vars=values_and_vars,
+            padx_checkbox=self.padx_checkbox, pady_checkbox=self.pady_checkbox
+        )
+        self.frame_contabilidad.grid(
+            row=row, column=column, rowspan=rowspan, columnspan=columnspan,
+            padx=self.padx_frame, pady=self.pady_frame, sticky="nsew", 
+        )
+
 
     def setupProcessFrame(
         self, row:int = 1, column:int = 0, rowspan:int = 1, columnspan:int = 1
