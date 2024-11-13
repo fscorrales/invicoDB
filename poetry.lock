@@ -559,7 +559,7 @@ xlrd = "^2.0.1"
 type = "git"
 url = "https://github.com/fscorrales/invicodatpy.git"
 reference = "HEAD"
-resolved_reference = "e51a38b4e1d5dcb86052d0c0e0187e4aefdae0d2"
+resolved_reference = "27f0ffacf43cfa3def40301f8f0cfc4538487166"
 
 [[package]]
 name = "numpy"

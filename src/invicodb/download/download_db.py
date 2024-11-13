@@ -276,7 +276,7 @@ class DownloadSIIF():
 
     # --------------------------------------------------
     def download_complete_mayor_contable_rcocc31(
-        self, ejercicios: list
+        self, ejercicios: list, filtro_nivel:str = None
     ):
         print("- Descargando LIBRO DIARIO SIIF's rvicon01 + rcocc31 -")
         if not self.download_all:
@@ -284,7 +284,7 @@ class DownloadSIIF():
         df = JoinResumenMayorContable()
         df.download_and_unite_reports(
             os.path.join(self.output_path, "Movimientos Contables (rcocc31)"),
-            ejercicios=ejercicios
+            ejercicios=ejercicios, filtro_nivel=filtro_nivel
         )
         # if not self.download_all:
         #     self.quit()

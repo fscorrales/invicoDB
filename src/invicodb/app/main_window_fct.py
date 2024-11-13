@@ -1,6 +1,6 @@
 import datetime as dt
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..download.download_db import (
     CopyIcaro,
@@ -315,7 +315,12 @@ class MainWindowFct():
                     ejercicios, ctas_contables=ctas_contables
                 )
             if self.mw.frame_siif.var_rcocc31_complete.get() == 1:
-                siif.download_complete_mayor_contable_rcocc31(ejercicios)
+                contabilidad_solo_pasivo = False
+                if str(self.mw.optional_process_type.get()) == "Control Deuda Flotante":
+                    contabilidad_solo_pasivo = True
+                siif.download_complete_mayor_contable_rcocc31(
+                    ejercicios, filtro_nivel='2000' if contabilidad_solo_pasivo else None
+                )
             if self.mw.frame_siif.var_rfp_p605b.get() == 1:
                 last_ejercicio = int(ejercicios[-1])
                 if last_ejercicio < dt.datetime.now().year:
@@ -433,6 +438,9 @@ class MainWindowFct():
         print('***Finalizando descarga de datos***')
     def processUpdate(self):
         print('***Iniciando actualización de Base de Datos***')
+        ejercicio_desde = int(self.mw.option_desde.get())
+        ejercicio_hasta = int(self.mw.option_hasta.get())
+        ejercicios = list(map(str, range(ejercicio_desde, ejercicio_hasta + 1)))
         # Generamos output path y credentials path
         input_path = HanglingPath().get_update_path_input()
         output_path = HanglingPath().get_db_path()
@@ -465,7 +473,7 @@ class MainWindowFct():
                 siif.update_comprobantes_rec_rci02()  
             if (self.mw.frame_siif.var_rcocc31.get() == 1 or 
                 self.mw.frame_siif.var_rcocc31_complete.get() == 1):
-                siif.update_mayor_contable_rcocc31()
+                siif.update_mayor_contable_rcocc31(years=ejercicios)
             if self.mw.frame_siif.var_rfp_p605b.get() == 1:
                 siif.update_form_gto_rfp_p605b()
             # Actualizamos estos reportes siempre
@@ -561,7 +569,9 @@ class MainWindowFct():
         print('***Finalizando actualización de Base de Datos***')
     def processUpload(self):
         print('***Iniciando subida de datos a Google Sheet***')
-
+        ejercicio_desde = int(self.mw.option_desde.get())
+        ejercicio_hasta = int(self.mw.option_hasta.get())
+        ejercicios = list(map(str, range(ejercicio_desde, ejercicio_hasta + 1)))
         ejercicio_actual = str(dt.datetime.now().year)
         ejercicio_anterior = str(dt.datetime.now().year - 1)
         # ejercicio_siguiente = str(dt.datetime.now().year + 1)
@@ -637,6 +647,6 @@ class MainWindowFct():
         if len(contabilidad_list) > 0:
 
             if self.mw.frame_contabilidad.var_deuda_flotante.get() == 1:
-                upload.upload_control_contable_deuda_flotante([ejercicio_actual, ejercicio_anterior])
+                upload.upload_control_contable_deuda_flotante(ejercicios)
 
         print('***Finalizando subida de datos a Google Sheet***')
