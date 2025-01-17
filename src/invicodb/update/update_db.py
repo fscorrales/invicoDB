@@ -34,7 +34,7 @@ from invicodatpy.siif import (
     ResumenFdosRfondo07tp,
 )
 from invicodatpy.slave import *
-from invicodatpy.sscc import BancoINVICO, CtasCtes, SdoFinalBancoINVICO
+from invicodatpy.sscc import BancoINVICO, CtasCtes, SdoFinalBancoINVICO, ListadoImputaciones
 
 from ..hangling_path import HanglingPath
 
@@ -213,6 +213,7 @@ class UpdateSSCC():
         self.update_banco_invico()
         self.update_ctas_ctes()
         self.update_sdo_final_banco_invico()
+        self.update_listado_imputaciones()
 
     # --------------------------------------------------
     def update_banco_invico(self):
@@ -236,6 +237,14 @@ class UpdateSSCC():
         df = CtasCtes()
         df.update_sql_db(
             self.input_path + '/cta_cte/cta_cte.xlsx',
+            output_path=self.output_path, clean_first=True)
+
+    # --------------------------------------------------
+    def update_listado_imputaciones(self):
+        print("- Actualizando SSCC's Listado Imputaciones Banco INVICO -")
+        df = ListadoImputaciones()
+        df.update_sql_db(
+            self.input_path + '/Listado Imputaciones SSCC/Bancos - Listado de Imputaciones.csv',
             output_path=self.output_path, clean_first=True)
 
 # --------------------------------------------------

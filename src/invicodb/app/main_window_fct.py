@@ -513,6 +513,8 @@ class MainWindowFct():
                 sscc.update_ctas_ctes()
             if self.mw.frame_sscc.var_sdo_final_banco_invico.get() == 1:
                 sscc.update_sdo_final_banco_invico()
+            if self.mw.frame_sscc.var_imputaciones_banco_invico.get() == 1:
+                sscc.update_listado_imputaciones()
 
         # Verificamos si existen reportes del Sist Recuperos para descargar
         recuperos_list = self.mw.frame_recuperos.getText()

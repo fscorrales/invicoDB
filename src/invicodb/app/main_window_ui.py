@@ -177,6 +177,7 @@ class MainWindowUI():
             'Listado de Cuentas Corrientes (Manual)':'var_ctas_ctes',
             'Consulta General de Movimientos':'var_banco_invico',
             'Saldo Final Banco INVICO (Manual)':'var_sdo_final_banco_invico',
+            'Listado de Imputaciones (Manual)':'var_imputaciones_banco_invico',
         }
         self.frame_sscc = MyScrollableCheckboxFrame(
             self.tab_download_update, title="Sistema de Seguimiento de Ctas Ctes (SSCC)", 

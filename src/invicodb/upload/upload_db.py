@@ -1427,7 +1427,7 @@ class UploadGoogleSheet():
         """
         if ejercicio is None:
             ejercicio = self.ejercicio
-        ejercicio = list(set(ejercicio + ['2010', '2011', '2016', '2017', '2018']))
+        ejercicio = list(set(ejercicio + [str(x) for x in range(2010, 2025)]))
         ctrl_rdeu = rdeu012_with_accounting(
             db_path=self.output_path,
             ejercicios=ejercicio
@@ -1439,7 +1439,7 @@ class UploadGoogleSheet():
         date_cols = ['fecha', 'fecha_aprobado', 'fecha_desde', 'fecha_hasta']
         self.df[date_cols] = self.df[date_cols].apply(lambda x: x.dt.strftime('%d-%m-%Y'))
         spreadsheet_key = '1rYBKQhzz_5iahkFPXI5FtOwjqbJYLpNA_OMEfNR81us'
-        wks_name = 'siif_rdeu'
+        wks_name = 'bd_rdeu'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
@@ -1454,7 +1454,7 @@ class UploadGoogleSheet():
         self.df[date_cols] = self.df[date_cols].apply(lambda x: x.dt.strftime('%d-%m-%Y'))
         self.df = self.df.fillna('')
         spreadsheet_key = '1rYBKQhzz_5iahkFPXI5FtOwjqbJYLpNA_OMEfNR81us'
-        wks_name = 'siif_rcocc31'
+        wks_name = 'bd_rcocc31'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
@@ -1471,7 +1471,7 @@ class UploadGoogleSheet():
         self.df[fields_to_update] = self.df[fields_to_update].fillna(0)
         self.df = self.df.fillna('')
         spreadsheet_key = '1rYBKQhzz_5iahkFPXI5FtOwjqbJYLpNA_OMEfNR81us'
-        wks_name = 'siif_rdeu_cta_contable'
+        wks_name = 'bd_rdeu_cta_contable'
         self.gs.to_google_sheets(
             self.df,  
             spreadsheet_key = spreadsheet_key,
