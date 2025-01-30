@@ -207,6 +207,7 @@ class MainWindowFct():
             self.mw.frame_gastos.var_ctrl_debitos_bancarios.set(1)
         elif choice == "Control Deuda Flotante":
             self.unselectAllCheakBoxes()
+            self.mw.frame_siif.var_rvicon03.set(1)
             self.mw.frame_siif.var_rcocc31_complete.set(1)
             self.mw.frame_siif.var_rdeu012.set(1)
             self.mw.frame_sscc.var_ctas_ctes.set(1)
@@ -314,6 +315,8 @@ class MainWindowFct():
                 siif.download_mayor_contable_rcocc31(
                     ejercicios, ctas_contables=ctas_contables
                 )
+            if self.mw.frame_siif.var_rvicon03.get() == 1:
+                siif.download_resumen_contable_cta_rvicon03(ejercicios)  
             if self.mw.frame_siif.var_rcocc31_complete.get() == 1:
                 contabilidad_solo_pasivo = False
                 if str(self.mw.optional_process_type.get()) == "Control Deuda Flotante":
@@ -470,7 +473,9 @@ class MainWindowFct():
             if self.mw.frame_siif.var_ri102.get() == 1:
                 siif.update_ppto_rec_ri102()  
             if self.mw.frame_siif.var_rci02.get() == 1:
-                siif.update_comprobantes_rec_rci02()  
+                siif.update_comprobantes_rec_rci02()
+            if self.mw.frame_siif.var_rvicon03.get() == 1:
+                siif.update_resumen_contable_cta_rvicon03(years=ejercicios)  
             if (self.mw.frame_siif.var_rcocc31.get() == 1 or 
                 self.mw.frame_siif.var_rcocc31_complete.get() == 1):
                 siif.update_mayor_contable_rcocc31(years=ejercicios)

@@ -30,7 +30,7 @@ from invicodatpy.siif import (
     PptoGtosDescRf610,
     PptoGtosFteRf602,
     PptoRecRi102,
-    # ResumenContableCtaRvicon03,
+    ResumenContableCtaRvicon03,
     ResumenFdosRfondo07tp,
 )
 from invicodatpy.slave import *
@@ -108,6 +108,14 @@ class UpdateSIIF():
         df = MayorContableRcocc31()
         df.update_sql_db(
             self.input_path + '/Movimientos Contables (rcocc31)',
+            output_path=self.output_path, clean_first=False, years=years)
+
+    # --------------------------------------------------
+    def update_resumen_contable_cta_rvicon03(self, years:list[str] = None):
+        print("- Actualizando SIIF's rvicon03 -")
+        df = ResumenContableCtaRvicon03()
+        df.update_sql_db(
+            self.input_path + '/Resumen Contable Por Cuenta (rvicon03)',
             output_path=self.output_path, clean_first=False, years=years)
 
     # --------------------------------------------------

@@ -33,7 +33,7 @@ from invicodatpy.siif import (
     PptoGtosDescRf610,
     PptoGtosFteRf602,
     PptoRecRi102,
-    # ResumenContableCtaRvicon03,
+    ResumenContableCtaRvicon03,
     ResumenFdosRfondo07tp,
     JoinResumenMayorContable,
 )
@@ -96,6 +96,7 @@ class DownloadSIIF():
             self.download_resumen_fdos_rfondo07tp(ejercicios)
             self.download_comprobantes_rec_rci02(ejercicios)
             self.download_ppto_rec_ri102(ejercicios)
+            self.download_resumen_contable_cta_rvicon03(ejercicios)
             self.download_mayor_contable_rcocc31(
                 ejercicios,
                 ctas_contables=[
@@ -270,6 +271,21 @@ class DownloadSIIF():
             os.path.join(self.output_path, "Movimientos Contables (rcocc31)"),
             ejercicios=ejercicios,
             ctas_contables=ctas_contables,
+        )
+        # if not self.download_all:
+        #     self.quit()
+
+    # --------------------------------------------------
+    def download_resumen_contable_cta_rvicon03(
+        self, ejercicios: list, ctas_contables: list = "1112-2-6"
+    ):
+        print("- Descargando SIIF's rcocc31 -")
+        if not self.download_all:
+            self.go_to_reports()
+        df = ResumenContableCtaRvicon03()
+        df.download_report(
+            os.path.join(self.output_path, "Resumen Contable Por Cuenta (rvicon03)"),
+            ejercicios=ejercicios
         )
         # if not self.download_all:
         #     self.quit()

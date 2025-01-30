@@ -134,6 +134,7 @@ class MainWindowUI():
             'Resumen de Fondos (rfondo07tp)':'var_rfondo07tp',
             'Presupuesto Recursos (ri102)':'var_ri102',
             'Comprobantes Recursos (rci02)':'var_rci02',
+            'Resumen Contable por Cuenta (rvicon03)':'var_rvicon03',
             'Mayor Contable (rcocc31)':'var_rcocc31',
             'Mayor Contable Completo (rcocc31)':'var_rcocc31_complete',
             'Formulación Gastos (rfp_p605b)':'var_rfp_p605b',
